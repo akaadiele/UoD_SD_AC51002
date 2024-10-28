@@ -1,6 +1,0 @@
-Item,Units per hour,Hours worked,Total units (per item),Total units (all items)
-Bags,30,8.0,240,240.0
-Shirts,50,8.0,400,640.0
-Trousers,50,8.0,400,1040.0
-Shoes,20,8.0,160,1200.0
-Jackets,70,8.0,560,1760.0

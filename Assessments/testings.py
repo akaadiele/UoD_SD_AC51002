@@ -50,22 +50,30 @@ staffId = 'aka'
 
 
 productsCataloguePerHour = { 'bags':30, 'shirts':50, 'trousers':50, 'shoes':20, 'jackets':70}
-print(len(productsCataloguePerHour))
+# print(len(productsCataloguePerHour))
 
 print('')
-with open(directoryPath + str(staffId) + "/Production_Logs.txt", "r",encoding="UTF-8") as openedFile:
-    # fileContent = openedFile.read()
-    # print(fileContent)
-    for line in openedFile:
-        # print(line.rstrip())
-        currentContent = line.rstrip()
-        currentItem , currentItemQty = currentContent.split(" - ")
-        print(currentItem +" is "+ currentItemQty)
+# with open(directoryPath+ "/Staff_Production_Logs/"  + str(staffId) +".txt", "r",encoding="UTF-8") as openedFile:
+#     fileContent = openedFile.read()
+#     # print(fileContent)
     
-for i in range(0, len(productsCataloguePerHour)):
-    print('')
-    print('looping now')
-    print('')
+#     lineNumber = 0
+#     for line in openedFile:
+#         # print(line.rstrip())
+#         if lineNumber == 0:
+#             pass
+#         else:
+#             # currentContent = line.rstrip()
+#             items , itemsPerHour , hoursWorked , totalPerItem , totalAllItems = line.rstrip().split(",")
+#             print(items , itemsPerHour , hoursWorked , totalPerItem , totalAllItems)
+        
+#         lineNumber += 1
+        
+        
+# for i in range(0, len(productsCataloguePerHour)):
+#     print('')
+#     print('looping now')
+#     print('')
 
 
 
@@ -81,5 +89,14 @@ for i in range(0, len(productsCataloguePerHour)):
 # Total Items Produced: 1760 items
 # len(productsCataloguePerHour)
     
-retrievedProductionData = { "Bags":30, "Shirts":50, "Trousers":50, "Shoes":20, "Jackets":70}
-    
+# retrievedProductionData = { "Bags":30, "Shirts":50, "Trousers":50, "Shoes":20, "Jackets":70}
+
+path = directoryPath + "/Staff_Production_Logs/"
+# with open( path, "r", encoding="UTF-8" ) as openedFile:
+    # fileContent = openedFile.read()
+
+fileNames = next(os.walk(directoryPath + "/Staff_Production_Logs/"), (None, None, []))[2]  # [] if no file
+# print(fileNames)
+for fileName in fileNames:
+    print("\n Here is your previous production data for " + str(fileName.split('.txt')[0]) + ": \n")
+

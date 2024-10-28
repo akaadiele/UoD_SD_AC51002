@@ -45,16 +45,17 @@ operation.
 
 7. It should be able to record the total number of items produced, in the appropriate file and
 update the value at the end of each day.
-
+#---DONE---#
 
 8. It should display a 'Service Required' message when the maximum limit of operating hours is
 reached (a value can be assumed for this). It should also display the total number of items
 produced since the last maintenance.
+#---DONE---#
 
 9. It should reset all production and operational data, including total items produced and
 operating hours, to prepare for the next production cycle. It is assumed that the routine
 maintenance has been completed at this point.
-
+#---DONE---#
 
 Task A: Write a Python program that meets the above requirements for the conveyor belt system.
 
@@ -69,9 +70,11 @@ only proceed with them if you have successfully completed the main requirements 
 day. Your software should keep track of the number of items produced by each operator and
 display their individual totals at the point of maintenance along with the other data in
 requirement 8 above
+#---DONE---#
 
 11. Update requirement 8 above so that the information is displayed for exactly 10 seconds before
 the system shuts down for maintenance
+#---DONE---#
 
 ****************************************************************************************************************************************************************
 ****************************************************************************************************************************************************************
