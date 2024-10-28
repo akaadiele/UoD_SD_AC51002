@@ -1,0 +1,9 @@
+Item,Quantity Produced
+bags,240
+shirts,400
+trousers,400
+shoes,160
+jackets,560
+
+Operating Hours = 8.0
+Grand Total Items Produced = 1760
