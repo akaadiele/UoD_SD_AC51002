@@ -1,0 +1,8 @@
+Bags - 240
+Shirts - 400
+Trousers - 400
+Shoes - 160
+Jackets - 560
+
+Staff Operating Hours: 8 hours 
+Total Items Produced: 1760 items

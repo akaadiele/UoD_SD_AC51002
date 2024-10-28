@@ -63,11 +63,9 @@ with open(directoryPath + str(staffId) + "/Production_Logs.txt", "r",encoding="U
         print(currentItem +" is "+ currentItemQty)
     
 for i in range(0, len(productsCataloguePerHour)):
-        
-
-print('')
-print('looping now')
-print('')
+    print('')
+    print('looping now')
+    print('')
 
 
 
