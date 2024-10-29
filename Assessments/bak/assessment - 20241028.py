@@ -21,7 +21,7 @@ import sys, time, os
 def outOfService():
     print("\n\n")
     print("Service Required")
-    
+    print("------------------------------------------\n")
 
     # Walk through directory, building a list with the file names within the directory
     fileNames = next(os.walk(baseDirectoryPath + "/Staff_Production_Logs/"), (None, None, []))[2]  # [] if no file
@@ -33,7 +33,7 @@ def outOfService():
             #---DONE---#
             fileContent = openedFile.read()
             print("------------------------------------------\n")
-            print("Production data for " + str( fileName.split('.txt')[0] ) + ": \n")
+            print("Here is your previous production data for " + str( fileName.split('.txt')[0] ) + ": \n")
             print(fileContent + "\n") 
 
         # 9. It should reset all production and operational data, including total items produced and
@@ -43,6 +43,8 @@ def outOfService():
         with open( fileName, "w", encoding="UTF-8" ) as openedFile:
             openedFile.write('')
         
+        time.sleep(1)
+
     updateOperatingHours(0, 0)
     
     # 11. Update requirement 8 above so that the information is displayed for exactly 10 seconds before
@@ -58,11 +60,11 @@ def outOfService():
 # 7. It should be able to record the total number of items produced, in the appropriate file and
 # update the value at the end of each day.
 # ---DONE---#
-def retrieveStaffData(operatorId, printStaffData='N'):
+def retrieveStaffData(staffId, printStaffData='N'):
     
     
     try:
-        with open( baseDirectoryPath + "/Staff_Production_Logs/"  + str(operatorId) +".txt", "r", encoding="UTF-8" ) as openedFile:
+        with open( baseDirectoryPath + "/Staff_Production_Logs/"  + str(staffId) +".txt", "r", encoding="UTF-8" ) as openedFile:
             fileContent = openedFile.read()
             if (printStaffData == 'Y'):
                 print("\n------------------------------------------")
@@ -74,7 +76,7 @@ def retrieveStaffData(operatorId, printStaffData='N'):
                 print("------------------------------------------\n \n")
                 time.sleep(2)
 
-            with open( baseDirectoryPath + "/Staff_Production_Logs/"  + str(operatorId) +".txt", "r", encoding="UTF-8" ) as openedFile:
+            with open( baseDirectoryPath + "/Staff_Production_Logs/"  + str(staffId) +".txt", "r", encoding="UTF-8" ) as openedFile:
                 for line in openedFile:
                     itemNames , itemsPerHour , previousHoursWorked , totalPerItem , totalAllItems = line.rstrip().split(",")
     except FileNotFoundError:
@@ -93,7 +95,7 @@ def retrieveStaffData(operatorId, printStaffData='N'):
 # 6. The software should be able to store the total number of items produced either in the .txt file in
 # requirement 3 above or a separate file and retrieve the value at the start of the next day’s operation.
 # ---DONE---#
-def storeStaffData(operatorId, operatingHours, previousHoursWorked):
+def storeStaffData(staffId, operatingHours, previousHoursWorked):
 
     if (previousHoursWorked != ""):
         operatingHours += previousHoursWorked
@@ -109,7 +111,7 @@ def storeStaffData(operatorId, operatingHours, previousHoursWorked):
         )
 
     # Write to file
-    fileName = baseDirectoryPath + "/Staff_Production_Logs/"  + str(operatorId) +".txt"
+    fileName = baseDirectoryPath + "/Staff_Production_Logs/"  + str(staffId) +".txt"
     try:
         os.makedirs(baseDirectoryPath + "/Staff_Production_Logs/")
     except FileExistsError:
@@ -161,13 +163,14 @@ def updateOperatingHours(operatingHours, hoursWorked):
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
 def logIn(clockInTime):
-    operatorId = (input("\nEnter your assigned User Id: ")).upper()
+    staffId = input("\nEnter your assigned User Id: ")
+    # staffId = (input("\nEnter your assigned User Id: ")).upper()
     print(
-        f"\nWelcome, {operatorId}. \nYour clock-in time for today is {clockInTime[0:2]}:{clockInTime[2:4]}",
+        f"\nWelcome, {staffId}. \nYour clock-in time for today is {clockInTime[0:2]}:{clockInTime[2:4]}",
         end="\n",
     )
 
-    retrieveStaffData(operatorId, printStaffData='Y')
+    retrieveStaffData(staffId, printStaffData='Y')
 
     hoursWorked = (int(workingHoursStop) - int(clockInTime)) / 100
     productionTime = int(clockInTime) + 100
@@ -182,7 +185,7 @@ def logIn(clockInTime):
         currentOperatingHours = retrieveOperatingHours() + ( (productionTime - int(clockInTime)) / 100)
         if (currentOperatingHours >= operatingHoursLimit):
             hoursWorked = (productionTime - int(clockInTime)) / 100
-            storeStaffData(operatorId, hoursWorked, retrieveStaffData(operatorId))
+            storeStaffData(staffId, hoursWorked, retrieveStaffData(staffId))
             updateOperatingHours(retrieveOperatingHours(), hoursWorked)
             outOfService()
         
@@ -190,19 +193,62 @@ def logIn(clockInTime):
 
     print("\n...Production Concluded...")
 
-    return operatorId, hoursWorked
+    return staffId, hoursWorked
 
 
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
+
+
+def beginOperations(currentTime):
+    # Loop through 24hour cycles
+    while (currentTime >= 0000) and (currentTime < 2400):
+        currentTimeFmt = str(currentTime).zfill(4)
+        currentTimeHr = currentTimeFmt[0:2]
+        currentTimeMin = currentTimeFmt[2:4]
+
+        print(f"\nThe time is: {currentTimeHr} : {currentTimeMin}")
+
+        # Check if the current time falls within working hours
+        if (int(currentTime) >= int(workingHoursStart)) and (int(currentTime) < int(workingHoursStop)):
+            # Task 1
+            print("System online...")
+            print("Enter the appropriate command: ")
+            print("   >>> 'START' - Begin production <<<")
+            print("   >>> 'EXIT' - End production<<<")
+            print("   >>> Enter any other key or leave blank to skip next check-in")
+            logInPrompt = input("")
+            
+            currentOperatingHours = retrieveOperatingHours()
+                
+            if logInPrompt.upper() == "START":
+                staffId, hoursWorked = logIn(currentTimeFmt)
+
+                updateOperatingHours(currentOperatingHours, hoursWorked)
+                storeStaffData(staffId, hoursWorked, retrieveStaffData(staffId))
+
+                currentTime += hoursWorked * 100
+            elif logInPrompt.upper() == "EXIT":
+                sys.exit()
+            else:
+                currentTime += 100
+
+            if (currentOperatingHours >= operatingHoursLimit):
+                outOfService()
+        else:
+            print("The system is currently offline")
+            print("----------------------------------")
+            currentTime += 100
+
+        if (currentTime > 2300): 
+            currentTime = 0
+        
+        time.sleep(1)
 
 
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
 # Declaring Global Variables:
-
-currentTime = 0 ; operatingHoursLimit = 50
-workingHoursStart = 900 ; workingHoursStop = 1700
 
 # Task 5
 itemsCatalog = {
@@ -212,6 +258,9 @@ itemsCatalog = {
     "Shoes": 20,
     "Jackets": 70,
 }
+
+operatingHoursLimit = 50
+workingHoursStart = 900 ; workingHoursStop = 1700
 
 # Get the root directory for the location of python program
 baseDirectoryPath = os.path.dirname(os.path.abspath(__file__)) + "/DundeeZest_Files/"
@@ -224,47 +273,6 @@ except FileExistsError:
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
 # Initiating function to begin operations
-
-# Loop through 24hour cycles
-while (currentTime >= 0000) and (currentTime < 2400):
-    currentTimeFmt = str(currentTime).zfill(4)
-    
-    print(f"\nThe time is: {currentTimeFmt[0:2]} : {currentTimeFmt[2:4]}")
-
-    # Check if the current time falls within working hours
-    if (int(currentTime) >= int(workingHoursStart)) and (int(currentTime) < int(workingHoursStop)):
-        # Task 1
-        print("System online...")
-        print("Enter the appropriate command: ")
-        print("   >>> 'START' - Begin production <<<")
-        print("   >>> 'EXIT' - End production<<<")
-        print("   >>> Enter any other key or leave blank to skip next check-in")
-        logInPrompt = input("")
-        
-        currentOperatingHours = retrieveOperatingHours()
-            
-        if logInPrompt.upper() == "START":
-            operatorId, hoursWorked = logIn(currentTimeFmt)
-
-            updateOperatingHours(currentOperatingHours, hoursWorked)
-            storeStaffData(operatorId, hoursWorked, retrieveStaffData(operatorId))
-
-            currentTime += hoursWorked * 100
-        elif logInPrompt.upper() == "EXIT":
-            sys.exit()
-        else:
-            currentTime += 100
-
-        if (currentOperatingHours >= operatingHoursLimit):
-            outOfService()
-    else:
-        print("The system is currently offline")
-        print("----------------------------------")
-        currentTime += 100
-
-    if (currentTime > 2300): 
-        currentTime = 0
-    
-    time.sleep(1)
+beginOperations(0)
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
