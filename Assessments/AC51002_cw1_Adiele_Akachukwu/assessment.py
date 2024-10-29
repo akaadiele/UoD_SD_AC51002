@@ -13,61 +13,61 @@ import os, sys, time
 
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------
+# Defining Functions to be used during execution
 
-# Task 9
 def resetData():
-    # Walk through directory, building a list with the file names within the directory
-    fileNames = next(os.walk(baseDirectoryPath + "/Staff_Production_Logs/"), (None, None, []))[2]  # [] if no file
+    # #9
+    # # Walk through directory, building a list with the file names within the directory
+    fileNames = next(os.walk(productionDataDirectory), (None, None, []))[2]  # [] if no file
     for fileName in fileNames:
-        with open( baseDirectoryPath + "/Staff_Production_Logs/"  + fileName, "w", encoding="UTF-8" ) as openedFile:
-            openedFile.write('')
+        with open( productionDataDirectory  + fileName, "w", encoding="UTF-8" ) as openedFile:
+            openedFile.write("")  ;  # Reset Production Data
     
-    # with open( baseDirectoryPath + "/Operating_Hours_Log.txt", "w", encoding="UTF-8" ) as openedFile:
-    #     openedFile.write('')
-        
-    updateOperatingHours(0,0)
+    
+    updateOperatingHours(0,0)  ;  # Reset Operating Hours
 
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
 
-# Task 8
+
 def outOfService():
+    # #8
     print("\n\nService Required")
     
     # Walk through directory, building a list with the file names within the directory
-    fileNames = next(os.walk(baseDirectoryPath + "/Staff_Production_Logs/"), (None, None, []))[2]  # [] if no file
+    fileNames = next(os.walk(productionDataDirectory), (None, None, []))[2]  # [] if no file
     for fileName in fileNames:
-        with open( baseDirectoryPath + "/Staff_Production_Logs/"  + fileName, "r", encoding="UTF-8" ) as openedFile:
-            # Task 10
+        with open( productionDataDirectory  + fileName, "r", encoding="UTF-8" ) as openedFile:
+            # #10
             print("------------------------------------------\n")
-            print("Production data for Operator - " + str( fileName.split('.txt')[0] ) + "\n")
+            print("Production data for Operator - " + str( fileName.split(".txt")[0] ) + "\n")
             
             for line in openedFile:
                 itemNames , itemsPerHour , previousHoursWorked , previousTotalPerItem , previousTotalAllItems = line.rstrip().split(",")
-                print(itemNames +': '+ previousTotalPerItem)
+                print(itemNames +": "+ previousTotalPerItem)
             
-            print('\nTotal Items: ' + previousTotalAllItems)
+            print("\nTotal Items: " + previousTotalAllItems)
 
-    # Task 9
+    # #9
     resetData()
-        # os.remove(baseDirectoryPath + "/Staff_Production_Logs/"  + fileName)
-    # os.remove(baseDirectoryPath + "/Operating_Hours_Log.txt")
 
-    # Task 11
+    # #11
     time.sleep(10)
     
     print("------------------------------------------\n")
-    print("\n***System shutting down***")
+    print("\n***System shutting down***\n")
     sys.exit()
 
 
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
 
-# Task 7
-def retrieveStaffData(operatorId):
+def retrieveOperatorData(operatorId):
+    # #7
     try:
-        with open( baseDirectoryPath + "/Staff_Production_Logs/"  + str(operatorId) +".txt", "r", encoding="UTF-8" ) as openedFile:
+        with open( productionDataDirectory  + str(operatorId) +".txt", "r", encoding="UTF-8" ) as openedFile:
             for line in openedFile:
                 itemNames , itemsPerHour , previousHoursWorked , previousTotalPerItem , previousTotalAllItems = line.rstrip().split(",")
     except FileNotFoundError:
@@ -77,9 +77,9 @@ def retrieveStaffData(operatorId):
 
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
-# Task 6
-def updateStaffData(operatorId, operatingHours, previousHoursWorked):
 
+def updateOperatorData(operatorId, operatingHours, previousHoursWorked):
+    # #6
     if (previousHoursWorked != ""):
         operatingHours += previousHoursWorked
     
@@ -94,9 +94,9 @@ def updateStaffData(operatorId, operatingHours, previousHoursWorked):
         )
 
     # Write to file
-    fileName = baseDirectoryPath + "/Staff_Production_Logs/"  + str(operatorId) +".txt"
+    fileName = productionDataDirectory  + str(operatorId) +".txt"
     try:
-        os.makedirs(baseDirectoryPath + "/Staff_Production_Logs/")
+        os.makedirs(productionDataDirectory)
     except FileExistsError:
         # directory already exists
         pass
@@ -107,11 +107,10 @@ def updateStaffData(operatorId, operatingHours, previousHoursWorked):
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
 
-
-# Task 3
 def retrieveOperatingHours():
+    # #3
     try:
-        with open(baseDirectoryPath + "/Operating_Hours_Log.txt", "r", encoding="UTF-8") as openedFile:
+        with open(baseDirectory + "/Operating_Hours_Log.txt", "r", encoding="UTF-8") as openedFile:
             fileContent = openedFile.read()
             operatingHours = int(fileContent)
     except FileNotFoundError:
@@ -123,12 +122,11 @@ def retrieveOperatingHours():
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
 
-# Task 4
 def updateOperatingHours(operatingHours, hoursWorked):
-
+    # #4
     operatingHours += hoursWorked
 
-    with open( baseDirectoryPath + "/Operating_Hours_Log.txt", "w", encoding="UTF-8" ) as openedFile:
+    with open( baseDirectory + "/Operating_Hours_Log.txt", "w", encoding="UTF-8" ) as openedFile:
         openedFile.write(str(int(operatingHours)))
     
     return operatingHours
@@ -142,20 +140,20 @@ def logIn(clockInTime):
     print(f"\nWelcome, {operatorId}." )
     print(f"\nYour clock-in time for today is {clockInTime[0:2]}:{clockInTime[2:4]}",end="\n",)
 
-    retrieveStaffData(operatorId)
+    retrieveOperatorData(operatorId)
 
     hoursWorked = (int(workingHoursStop) - int(clockInTime)) / 100
     productionTime = int(clockInTime) + 100
 
     # Loop through operating hours
     while productionTime < int(workingHoursStop):
-        # Task 2
+        # #2
         print(f"[Time: {str(productionTime)[0:2]}:{str(productionTime)[2:4]}] ... Production is progress")
         
         currentOperatingHours = retrieveOperatingHours() + ( (productionTime - int(clockInTime)) / 100)
         if (currentOperatingHours >= operatingHoursLimit):
             hoursWorked = (productionTime - int(clockInTime)) / 100
-            updateStaffData(operatorId, hoursWorked, retrieveStaffData(operatorId))
+            updateOperatorData(operatorId, hoursWorked, retrieveOperatorData(operatorId))
             updateOperatingHours(retrieveOperatingHours(), hoursWorked)
             print("!!!\n") ; time.sleep(1)
             outOfService()
@@ -170,16 +168,14 @@ def logIn(clockInTime):
 
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
-
-
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
+
 # Declaring Global Variables:
-
-currentTime = 0 ; operatingHoursLimit = 20
+currentTime = 0 ; operatingHoursLimit = 50
 workingHoursStart = 900 ; workingHoursStop = 1700
 
-# Task 5
+# #5
 itemsCatalog = {
     "Bags": 30,
     "Shirts": 50,
@@ -189,26 +185,28 @@ itemsCatalog = {
 }
 
 # Get the root directory for the location of python program
-baseDirectoryPath = os.path.dirname(os.path.abspath(__file__)) + "/DundeeZest_Files/"
+baseDirectory = os.path.dirname(os.path.abspath(__file__)) + "/DundeeZest_Files/"
+productionDataDirectory = baseDirectory + "/Production_Data/"
 try:
-    os.makedirs(baseDirectoryPath)
+    os.makedirs(baseDirectory)
+    os.makedirs(productionDataDirectory)
 except FileExistsError:
     # directory already exists
     pass
 
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
-# Initiating function to begin operations
 
-# Loop through 24hour cycles
+# Begin operations
 while (currentTime >= 0000) and (currentTime < 2400):
+# Loop through 24hour cycles
     currentTimeFmt = str(currentTime).zfill(4)
     
     print(f"\n[Time: {currentTimeFmt[0:2]} : {currentTimeFmt[2:4]}]")
 
     # Check if the current time falls within working hours
     if (int(currentTime) >= int(workingHoursStart)) and (int(currentTime) < int(workingHoursStop)):
-        # Task 1
+        # #1
         print("System online ... \n----------------------------------")
         print("Enter the appropriate command and press the 'ENTER' key: ")
         print("   *** 'START' - Begin production ***")
@@ -222,7 +220,7 @@ while (currentTime >= 0000) and (currentTime < 2400):
             operatorId, hoursWorked = logIn(currentTimeFmt)
 
             updateOperatingHours(currentOperatingHours, hoursWorked)
-            updateStaffData(operatorId, hoursWorked, retrieveStaffData(operatorId))
+            updateOperatorData(operatorId, hoursWorked, retrieveOperatorData(operatorId))
 
             currentTime += hoursWorked * 100
         elif logInPrompt.upper() == "EXIT":
@@ -243,5 +241,7 @@ while (currentTime >= 0000) and (currentTime < 2400):
     time.sleep(1)
 # Loop ends
 
+# ---------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
