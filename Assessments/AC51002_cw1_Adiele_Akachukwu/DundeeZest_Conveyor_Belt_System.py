@@ -1,10 +1,15 @@
+# ---------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------
+
 """
 * Course Code  : AC51002 - Software Development
 * Title   : Assignment 1
 * Developed By : Adiele Akachukwu
-* Date Created : Tuesday, October 28, 2024
+* Date Created : Tuesday, November 4, 2024
 """
 
+# ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
 
@@ -13,26 +18,46 @@ import os, sys, time
 
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
+
+# Declaring Global Variables:
+currentTime = 0 ; operatingHoursLimit = 50 ; workingHoursStart = 900 ; workingHoursStop = 1700
+
+# #5
+itemsCatalog = { "Bags": 30, "Shirts": 50, "Trousers": 50, "Shoes": 20, "Jackets": 70, }
+
+# Get the root directory for the location of python program
+baseDirectory = os.path.dirname(os.path.abspath(__file__)) + "/DundeeZest_Files/"
+productionDataDirectory = baseDirectory + "/Production_Data/"
+try:
+    # Redundancy check to create directories if they do not exist
+    os.makedirs(baseDirectory)
+    os.makedirs(productionDataDirectory)
+except FileExistsError:
+    # directory already exists
+    pass
+
+# ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
 # Defining Functions to be used during execution
 
+
+# Resetting data stored on files
 def resetData():
     # #9
-    # # Walk through directory, building a list with the file names within the directory
+    # Walk through directory, building a list with the file names within the directory
     fileNames = next(os.walk(productionDataDirectory), (None, None, []))[2]  # [] if no file
     for fileName in fileNames:
         with open( productionDataDirectory  + fileName, "w", encoding="UTF-8" ) as openedFile:
-            openedFile.write("")  ;  # Reset Production Data
-    
-    
+            openedFile.write("")  ;  # Reset Production Data for each operator
+        
     updateOperatingHours(0,0)  ;  # Reset Operating Hours
 
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
 
-
-def outOfService():
+# Initiating service maintenance
+def triggerServiceMaintenance():
     # #8
     print("\n\nService Required")
     
@@ -57,13 +82,13 @@ def outOfService():
     time.sleep(10)
     
     print("------------------------------------------\n")
-    print("\n***System shutting down***\n")
+    print("\n***System shutting down for maintenance***\n")
     sys.exit()
 
-
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
 
+# Reading Operator Data stored on file
 def retrieveOperatorData(operatorId):
     # #7
     try:
@@ -78,6 +103,7 @@ def retrieveOperatorData(operatorId):
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
 
+# Updating Operator Data on file
 def updateOperatorData(operatorId, operatingHours, previousHoursWorked):
     # #6
     if (previousHoursWorked != ""):
@@ -86,27 +112,21 @@ def updateOperatorData(operatorId, operatingHours, previousHoursWorked):
     itemNames = list(itemsCatalog.keys())
     itemsPerHour = list(itemsCatalog.values())
     totalItems = 0
-    fileContent = "Items,Quantity Produced per Hour,Hours Worked,Total (per item),Total (all items)"
+    fileContent = "Items,Quantity Produced per Hour,Hours Worked,Total (per item),Total (all items)"    ; # Including a header line for the file
 
     for i in range(0, len(itemsCatalog)):
         totalItems += itemsPerHour[i] * operatingHours
-        fileContent += ( "\n" + str(itemNames[i]) + "," + str(int(itemsPerHour[i])) + "," + str(int(operatingHours)) + "," + str(int(itemsPerHour[i] * operatingHours)) + "," + str(int(totalItems))
-        )
+        fileContent += ( "\n" + str(itemNames[i]) + "," + str(int(itemsPerHour[i])) + "," + str(int(operatingHours)) + "," + str(int(itemsPerHour[i] * operatingHours)) + "," + str(int(totalItems)) )
 
     # Write to file
     fileName = productionDataDirectory  + str(operatorId) +".txt"
-    try:
-        os.makedirs(productionDataDirectory)
-    except FileExistsError:
-        # directory already exists
-        pass
-
     with open( fileName, "w", encoding="UTF-8" ) as openedFile:
         openedFile.write(fileContent)
 
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
 
+# Reading Operating Hours stored on file
 def retrieveOperatingHours():
     # #3
     try:
@@ -118,10 +138,10 @@ def retrieveOperatingHours():
 
     return operatingHours
 
-
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
 
+# Updating Operating Hours on file
 def updateOperatingHours(operatingHours, hoursWorked):
     # #4
     operatingHours += hoursWorked
@@ -131,10 +151,10 @@ def updateOperatingHours(operatingHours, hoursWorked):
     
     return operatingHours
 
-
-
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
+
+# Operator login and Initiate production process 
 def logIn(clockInTime):
     operatorId = (input("\nEnter your assigned User Id: ")).upper()
     print(f"\nWelcome, {operatorId}." )
@@ -143,57 +163,29 @@ def logIn(clockInTime):
     retrieveOperatorData(operatorId)
 
     hoursWorked = (int(workingHoursStop) - int(clockInTime)) / 100
-    productionTime = int(clockInTime) + 100
+    currentProductionTime = int(clockInTime) + 100
 
     # Loop through operating hours
-    while productionTime < int(workingHoursStop):
+    while currentProductionTime < int(workingHoursStop):
         # #2
-        print(f"[Time: {str(productionTime)[0:2]}:{str(productionTime)[2:4]}] ... Production is progress")
+        print(f"[Time: {str(currentProductionTime)[0:2]}:{str(currentProductionTime)[2:4]}] ... Production is progress")
         
-        currentOperatingHours = retrieveOperatingHours() + ( (productionTime - int(clockInTime)) / 100)
+        currentOperatingHours = retrieveOperatingHours() + ( (currentProductionTime - int(clockInTime)) / 100)
         if (currentOperatingHours >= operatingHoursLimit):
-            hoursWorked = (productionTime - int(clockInTime)) / 100
+            hoursWorked = (currentProductionTime - int(clockInTime)) / 100
             updateOperatorData(operatorId, hoursWorked, retrieveOperatorData(operatorId))
             updateOperatingHours(retrieveOperatingHours(), hoursWorked)
             print("!!!\n") ; time.sleep(1)
-            outOfService()
+            triggerServiceMaintenance()
         
-        productionTime += 100
+        currentProductionTime += 100
     # Loop ends
 
     print(f"\n   ... Production Concluded ...")
 
     return operatorId, hoursWorked
 
-
 # ---------------------------------------------------------------------------------------------------
-# ---------------------------------------------------------------------------------------------------
-# ---------------------------------------------------------------------------------------------------
-# ---------------------------------------------------------------------------------------------------
-
-# Declaring Global Variables:
-currentTime = 0 ; operatingHoursLimit = 50
-workingHoursStart = 900 ; workingHoursStop = 1700
-
-# #5
-itemsCatalog = {
-    "Bags": 30,
-    "Shirts": 50,
-    "Trousers": 50,
-    "Shoes": 20,
-    "Jackets": 70,
-}
-
-# Get the root directory for the location of python program
-baseDirectory = os.path.dirname(os.path.abspath(__file__)) + "/DundeeZest_Files/"
-productionDataDirectory = baseDirectory + "/Production_Data/"
-try:
-    os.makedirs(baseDirectory)
-    os.makedirs(productionDataDirectory)
-except FileExistsError:
-    # directory already exists
-    pass
-
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
 
@@ -212,25 +204,25 @@ while (currentTime >= 0000) and (currentTime < 2400):
         print("   *** 'START' - Begin production ***")
         print("   *** 'EXIT' - End production ***")
         print("   *** Any other input or leave blank - Skip to next check-in hour ***")
-        logInPrompt = input(">>> ")
+        operatorInput = input(">>> ")
         
         currentOperatingHours = retrieveOperatingHours()
             
-        if logInPrompt.upper() == "START":
+        if operatorInput.upper() == "START":
             operatorId, hoursWorked = logIn(currentTimeFmt)
 
             updateOperatingHours(currentOperatingHours, hoursWorked)
             updateOperatorData(operatorId, hoursWorked, retrieveOperatorData(operatorId))
 
             currentTime += hoursWorked * 100
-        elif logInPrompt.upper() == "EXIT":
+        elif operatorInput.upper() == "EXIT":
             sys.exit()
         else:
             currentTime += 100
 
         if (currentOperatingHours >= operatingHoursLimit):
             print("!!!\n") ; time.sleep(1)
-            outOfService()
+            triggerServiceMaintenance()
     else:
         print("The system is currently offline \n----------------------------------")
         currentTime += 100
@@ -241,7 +233,6 @@ while (currentTime >= 0000) and (currentTime < 2400):
     time.sleep(1)
 # Loop ends
 
-# ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
