@@ -4,7 +4,7 @@
 
 """
 * Course Code  : AC51002 - Software Development
-* Title   : Assignment 1
+* Title   : Assignment 1 - Functional Programming
 * Developed By : Adiele Akachukwu
 * Date Created : Tuesday, November 4, 2024
 """
@@ -78,11 +78,11 @@ def triggerServiceMaintenance():
     # #9
     resetData()
 
-    # #11
-    time.sleep(10)
-    
     print("------------------------------------------\n")
     print("\n***System shutting down for maintenance***\n")
+
+    # #11
+    time.sleep(10)
     sys.exit()
 
 # ---------------------------------------------------------------------------------------------------
@@ -204,18 +204,18 @@ while (currentTime >= 0000) and (currentTime < 2400):
         print("   *** 'START' - Begin production ***")
         print("   *** 'EXIT' - End production ***")
         print("   *** Any other input or leave blank - Skip to next check-in hour ***")
-        operatorInput = input(">>> ")
+        commandInput = input(">>> ")
         
         currentOperatingHours = retrieveOperatingHours()
             
-        if operatorInput.upper() == "START":
+        if commandInput.upper() == "START":
             operatorId, hoursWorked = logIn(currentTimeFmt)
 
             updateOperatingHours(currentOperatingHours, hoursWorked)
             updateOperatorData(operatorId, hoursWorked, retrieveOperatorData(operatorId))
 
             currentTime += hoursWorked * 100
-        elif operatorInput.upper() == "EXIT":
+        elif commandInput.upper() == "EXIT":
             sys.exit()
         else:
             currentTime += 100
