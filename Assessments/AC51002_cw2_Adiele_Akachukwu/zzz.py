@@ -1,0 +1,34 @@
+import datetime, Banking
+
+# x = datetime.datetime.now()
+# print(x)
+# print(x.year)
+# print(x.month)
+# print(x.day)
+# print(x.)
+
+
+# print(datetime.datetime.now().year)
+# print(datetime.datetime.now().month)
+# print(datetime.datetime.now().day)
+
+
+
+
+firstName = "John"
+lastName = "Doe"
+dateOfBirth = "01/04/1990"
+phone = "1234"
+email = "jd@mail.com"
+occupation = "Doctor"
+customerId = "jd"
+customerPassword = "123"
+
+creationDate = str(datetime.datetime.now().day) +'/'+ str(datetime.datetime.now().month) +'/'+ str(datetime.datetime.now().year)
+
+loggedInCustomer = Banking.customer(firstName, lastName, dateOfBirth, phone, email, occupation, customerId, customerPassword, creationDate)
+
+print(loggedInCustomer.status)
+
+if (loggedInCustomer.status == "Created"):
+        print("Customer registered successfully")
