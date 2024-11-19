@@ -1,0 +1,1 @@
+21300001,aka,savings account,GBP,0,19/11/2024,active,Y,4,,,,,
