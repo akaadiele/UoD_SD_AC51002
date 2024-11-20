@@ -104,9 +104,7 @@ def getCustomerInfo(customerLoginId):
             firstName, lastName, dateOfBirth, phone, email, occupation, customerLoginId, customerPassword, creationDate, accountsList, customerId = fileContent.rstrip().split(",")
             customerObject = Banking.customer(firstName, lastName, dateOfBirth, phone, email, occupation, customerLoginId, customerPassword, creationDate)
             customerObject.customerId = customerId
-            
-            accountsListFmt = accountsList.replace('|', ',')
-            customerObject.customerAccountsList = list(accountsListFmt)
+            customerObject.customerAccountsList = accountsList.split('|')
             
             return customerObject
     except FileNotFoundError:
@@ -141,29 +139,53 @@ def accountMenu(accountId):
             if (accountObject != False):
                 accountBalance = accountObject.accountBalance
                 print("\n----------------------------------")
-                print(f"Your account balance is {accountBalance}")
+                print(f"Your account balance is {currencySymbol}{accountBalance}")
                 print("----------------------------------")
             else:
                 print("\n***! Account not found")
             
+            time.sleep(1)
             accountMenu(accountId)
                     
         case '2':
-            depositAmount = int(input("Enter amount to deposit: "))
-            accountObject.deposit(depositAmount)
+            print("Enter amount to deposit (or '#' to return): ")
+            inputValue = input(">>> ")
             
-            storeAccountInfo(accountObject)
+            if (inputValue == '#'):
+                pass
+            else:
+                try:
+                    depositAmount = float(inputValue)                
+                    accountObject = getAccountInfo(accountId)
+                    if (accountObject.deposit(depositAmount) == True):
+                        print(f"\Deposit of {currencySymbol}{depositAmount} was successful")
+                        print(f"New account balance is {accountObject.accountBalance}")
+
+                        storeAccountInfo(accountObject)
+                except ValueError:
+                    print("Invalid amount entered")
+            
             time.sleep(1)
             accountMenu(accountId)
             
         case '3':
-            withdrawalAmount = int(input("Enter amount to withdraw: "))
-            if ( accountObject.withdraw(withdrawalAmount) == True):
-                print(f"\nWithdrawal of {accountObject.currency}{withdrawalAmount} was successful")
-                print(f"New account balance is {accountObject.accountBalance}")
-                storeAccountInfo(accountObject)
+            print("Enter amount to withdraw (or '#' to return): ")
+            inputValue = input(">>> ")
+            
+            if (inputValue == '#'):
+                pass
             else:
-                print("Insufficient funds")
+                try:
+                    withdrawalAmount = float(inputValue)
+                    accountObject = getAccountInfo(accountId)
+                    if ( accountObject.withdraw(withdrawalAmount) == True):
+                        print(f"\nWithdrawal of {currencySymbol}{withdrawalAmount} was successful")
+                        print(f"New account balance is {accountObject.accountBalance}")
+                        
+                        storeAccountInfo(accountObject)
+                except ValueError:
+                    print("Invalid amount entered")
+            
             time.sleep(1)
             accountMenu(accountId)
             
@@ -180,12 +202,12 @@ def accountMenu(accountId):
             accountMenu(accountId)
 
         case '#':
-            pass
+            time.sleep(1)
         
         case _:
             print("\n***! Invalid Input\n")
             time.sleep(1)
-            customerMenu()
+            accountMenu(accountId)
     
 
 # ---------------------------------------------------------------------------------------------------
@@ -201,7 +223,7 @@ def createAccount(customerObject):
     accountId = '213' + str(len(existingAccountsList) + 1).zfill(5)
     
     customerLoginId = customerObject.customerLoginId
-    currency = countryCurrency
+    currency = "GBP"
     accountBalance = 0
     creationDate = str(todayDay) +'/'+ str(todayMonth) +'/'+ str(todayYear)
 
@@ -271,16 +293,26 @@ def adminMenu():
                     customerLoginId = fileName.split(".txt")[0]
                     print(f"{customersCount} - {customerLoginId}")
                     customersCount += 1 
-                customerSelected = int(input("\nEnter corresponding code for your customer: "))
-                returnVal = getCustomerInfo(fileNames[customerSelected - 1].split(".txt")[0])
-                if (returnVal != False):
-                    print(returnVal)
-                else:
-                    print("\n***! Customer file not found")
+                
+                print("\nEnter corresponding code for your customer (or '#' to return): ")
+                inputValue = input(">>> ")
+                try:
+                    if (inputValue == '#'):
+                        pass
+                    else:
+                        returnVal = getCustomerInfo(fileNames[int(inputValue) - 1].split(".txt")[0])
+                        if (returnVal != False):
+                            print("\n----------------------------------")
+                            print(returnVal)
+                        else:
+                            print("\n***! Customer file not found")
+                except IndexError:
+                    print("\n***! Invalid input")
             else:
                 print("\n***! No customer file found")
 
             print("\n----------------------------------")
+            time.sleep(1)
             adminMenu()
             
         case '2':
@@ -291,20 +323,31 @@ def adminMenu():
                     accountId = fileName.split(".txt")[0]
                     print(f"{accountsCount} - {accountId}")
                     accountsCount += 1 
-                accountSelected = int(input("\nEnter corresponding code for your account to view: "))
-                returnVal = getAccountInfo(fileNames[accountSelected - 1])
-                if (returnVal != False):
-                    print(returnVal)
-                else:
-                    print("\n***! Account not found")
+                
+                print("\nEnter corresponding code for your account (or '#' to return): ")
+                inputValue = input(">>> ")
+                try:
+                    if (inputValue == '#'):
+                        pass
+                    else:
+                        returnVal = getAccountInfo(fileNames[int(inputValue) - 1].split(".txt")[0])
+                        if (returnVal != False):
+                            print("\n----------------------------------")
+                            print(returnVal)
+                        else:
+                            print("\n***! Account not found")
+                except IndexError:
+                    print("\n***! Invalid input")
             else:
                 print("\n***! No account file found")
 
             
             print("\n----------------------------------")
+            time.sleep(1)
             adminMenu()
 
         case '#':
+            time.sleep(1)
             homeMenu()
         
         case _:
@@ -343,15 +386,17 @@ def customerMenu(customerFile):
 
     loggedInCustomer.customerId = customerId
     
-    accountsListFmt = accountsList.replace('|', ',')
-    loggedInCustomer.customerAccountsList = list(accountsListFmt)
+    if (accountsList == ''):
+        loggedInCustomer.customerAccountsList = ''
+    else:
+        loggedInCustomer.customerAccountsList = accountsList.split('|')
     numberOfAccounts = len(loggedInCustomer.customerAccountsList)
     
     print("\n----------------------------------")
     print(f"Hello {loggedInCustomer.firstName.title()},")
     print("----------------------------------\n")
-    print("1 - View accounts")
-    print("2 - Open an account")
+    print("1 - Accounts list")
+    print("2 - Open a new account")
     print("3 - View state of all accounts")
     print("# - Return to Home menu \n \n")
     inputValue = input(">>> ")
@@ -361,28 +406,40 @@ def customerMenu(customerFile):
             if ( numberOfAccounts != 0):
                 accountCount = 1
                 for account in loggedInCustomer.customerAccountsList:
-                    accountId = account.split(".txt")[0]
-                    print(f"{accountCount} - {accountId}")
+                    # accountId = account.split(".txt")[0]
+                    print(f"{accountCount} - {account}")
                     accountCount += 1
-                accountSelected = int(input("\nEnter corresponding code for your account: "))
-                returnVal = accountMenu(loggedInCustomer.customerAccountsList[accountSelected - 1])
+                print("\nEnter corresponding code for your account (or '#' to return): ")
+                inputValue = input(">>> ")
+                try:
+                    if (inputValue == '#'):
+                        pass
+                    else:
+                        print("\n----------------------------------")
+                        returnVal = accountMenu(loggedInCustomer.customerAccountsList[int(inputValue) - 1])
+                except IndexError:
+                    print("\n***! Invalid input")
             else:
                 print("\n***! No account file found")
+            
             time.sleep(1)
             customerMenu(customerFile)
             
         case '2':
             returnVal = createAccount(loggedInCustomer)
             if(returnVal != False):
-                if ( numberOfAccounts != 0):
-                    loggedInCustomer.customerAccountsList = accountsList +'|'+ returnVal.accountId
+                if ( numberOfAccounts == 0):
+                    loggedInCustomer.customerAccountsList = returnVal.accountId
                 else:
-                    loggedInCustomer.customerAccountsList = returnVal.accountId +'|'
+                    loggedInCustomer.customerAccountsList = accountsList +'|'+ returnVal.accountId
+                
                 storeCustomerInfo(loggedInCustomer)
                 with open( customersDirectory + loggedInCustomer.customerLoginId +".txt", "r", encoding="UTF-8" ) as openedFile:
                     fileContent = openedFile.read()
+                    time.sleep(1)
                     customerMenu(fileContent)
             else:
+                time.sleep(1)
                 customerMenu(customerFile)
             
         case '3':
@@ -390,10 +447,12 @@ def customerMenu(customerFile):
                 viewAllAccountsForCustomer(loggedInCustomer)
             else:
                 print("\n***! No account file found")
+            
             time.sleep(1)
             customerMenu(customerFile)
 
         case '#':
+            time.sleep(1)
             homeMenu()
         
         case _:
@@ -432,36 +491,36 @@ def registerCustomer():
     
     registrationStatus = ''
     
-    customerLoginId = input("Enter preferred log in ID: ")
+    customerLoginId = input("\nEnter preferred log in ID: ")
     returnVal = getCustomerInfo(customerLoginId.lower())
     if (returnVal != False):
         print("\n***! This id already exists")
     else:
-        firstName = input("Enter first name: ")
-        lastName = input("Enter last name: ")
+        firstName = input("\nEnter first name: ")
+        lastName = input("\nEnter last name: ")
         
-        dobDay = int(input("Enter Date of Birth - Day: "))
+        dobDay = int(input("\nEnter Date of Birth - Day: "))
         if ( (dobDay < 1) or (dobDay > 31) ):
             print("\n***! Invalid day inputted")
         else:
-            dobMonth = int(input("Enter Date of Birth - Month: "))
+            dobMonth = int(input("\nEnter Date of Birth - Month: "))
             if ( (dobMonth < 1) or (dobMonth > 12) ):
                 print("\n***! Invalid Month inputted")
             else:
-                dobYear = int(input("Enter Date of Birth - Day: "))
+                dobYear = int(input("\nEnter Date of Birth - Day: "))
                 if ( (len(str(dobYear)) < 0) or (len(str(dobYear)) > 4) or (dobYear > todayYear) ):
                     print("\n***! Invalid year inputted")
                 else:
                     dateOfBirth = str(dobDay) +'/'+ str(dobMonth) +'/'+ str(dobYear)
                     
-                    phone = input("Enter phone: ")
-                    email = input("Enter email: ")
+                    phone = input("\nEnter phone: ")
+                    email = input("\nEnter email: ")
                     if (email.count('@') != 1):
                         print("\n***! Invalid email inputted")
                     else:
-                        occupation = input("Enter occupation: ")
+                        occupation = input("\nEnter occupation: ")
                         creationDate = str(todayDay) +'/'+ str(todayMonth) +'/'+ str(todayYear)
-                        customerPassword = input("Enter preferred log in Password: ")
+                        customerPassword = input("\nEnter preferred log in Password: ")
                         
                         loggedInCustomer = Banking.customer(firstName, lastName, dateOfBirth, phone, email, occupation, customerLoginId, customerPassword, creationDate)
                         loggedInCustomer.generateCustomerId(customersDirectory)
@@ -500,17 +559,22 @@ def homeMenu():
     match inputValue:
         case '1':
             customerLogin()
+            time.sleep(1)
             homeMenu()            
             
         case '2':
             registerCustomer()
+            time.sleep(1)
             homeMenu()
             
         case '3':
             adminLogin()
+            time.sleep(1)
             homeMenu()
         
         case '#':
+            print("\n***! Exiting !***\n")
+            time.sleep(3)
             sys.exit()
         
         case _:
@@ -534,7 +598,7 @@ except FileExistsError:
     # directory already exists
     pass
 
-countryCurrency = "GBP"
+currencySymbol = "£"
 returnVal = ''
 
 todayDay = datetime.datetime.now().day

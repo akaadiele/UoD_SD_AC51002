@@ -18,9 +18,11 @@
 # ---------------------------------------------------------------------------------------------------
 
 # Importing Libraries
+import os, math
 
-import os
-    
+# Global variables
+currencySymbol = "£"
+
 # ---------------------------------------------------------------------------------------
 class customer():
     def __init__(self, firstName, lastName, dateOfBirth, phone, email, occupation, customerLoginId, customerPassword, creationDate):
@@ -43,7 +45,6 @@ class customer():
         
     def saveCustomerState(self, customersDirectory):
         fileName = customersDirectory  + self.customerLoginId +".txt"
-        
         fileContent = self.firstName + "," + self.lastName + "," + self.dateOfBirth \
             + "," + self.phone + "," + self.email + "," + self.occupation \
                 + "," + self.customerLoginId + "," + self.customerPassword \
@@ -56,19 +57,15 @@ class customer():
                 return False
             
     def __str__(self):
-        
-        if ( len(self.customerAccountsList) == 0):
-            customerAccountsList = 'N/A'
-        
         # output = "\nHello " + self.firstName.title() +", here are your details: \n\n"
         output = "\nName: " + self.firstName.title() +' '+ self.lastName.title() +" \n"
         output += "Date of Birth: " + self.dateOfBirth +" \n"
         output += "Phone: " + self.phone +" \n"
         output += "Email: " + self.email +" \n"
         output += "Occupation: " + self.occupation.title() +" \n"
-        output += "ID: " + self.customerLoginId +" \n"
+        output += "Login Id: " + self.customerLoginId +" \n"
         output += "Joined: " + self.creationDate +" \n"
-        output += "Accounts: " + str(customerAccountsList) +" \n"
+        output += "Accounts: " + str(self.customerAccountsList) +" \n"
         
         return output
     
@@ -81,24 +78,40 @@ class account():
         self.customerLoginId = customerLoginId
         self.accountType = accountType
         self.currency = currency
-        self.accountBalance = int(accountBalance)
+        self.accountBalance = float(accountBalance)
         self.creationDate = creationDate
         
         self.accountStatus = "active"
         
-
+        if (self.accountBalance > 0):
+            self.accountBalance = math.trunc(100 * self.accountBalance) / 100
 
     def deposit(self, depositAmount):
-        self.accountBalance += depositAmount
-        print(f"\nDeposit of {self.currency}{depositAmount} was successful")
-        print(f"New account balance is {self.accountBalance}")
-        return True
+        try:
+            if (depositAmount > 0):
+                self.accountBalance += depositAmount
+                return True
+            else:
+                print("\n***! Invalid amount entered")
+                return False
+        except ValueError:
+            print("\n***! Invalid amount entered")
+            return False
 
     def withdraw(self, withdrawalAmount):
-        if (self.accountBalance >= withdrawalAmount):
-            self.accountBalance -= withdrawalAmount
-            return True
-        else:
+        try:
+            if (withdrawalAmount > 0):
+                if (self.accountBalance >= withdrawalAmount):
+                    self.accountBalance -= withdrawalAmount
+                    return True
+                else:
+                    print("\n***! Insufficient funds")
+                    return False
+            else:
+                print("\n***! Invalid amount entered")
+                return False
+        except ValueError:
+            print("\n***! Invalid amount entered")
             return False
 
 
@@ -122,9 +135,9 @@ class account():
 
     def __str__(self):
         output = "Account Id: " + self.accountId
-        output += "\nCustomer Id: " + self.customerLoginId
+        output += "\nCustomer Login Id: " + self.customerLoginId
         output += "\nAccount Type: " + self.accountType.title()
-        output += "\nAccount Balance: " + self.currency + str(self.accountBalance)
+        output += "\nAccount Balance: " + currencySymbol + str(self.accountBalance)
         output += "\nAccount Created On: " + self.creationDate
         
         return output
@@ -159,16 +172,20 @@ class savingsAccount(account):
                 return False
 
     def calculateInterestAmount(self):
-        interestAmount = ( self.accountBalance * self.interestRate * (1 / 12) )
+        P = float(self.accountBalance)     ;# current Account balance
+        R = float(self.interestRate) / 100     ;# interest rate
+        T = 1 / 12  ; # 1 month of 12 months in a year
+        interestAmount = ( P * R * T )
+        interestAmount = math.trunc(100 * interestAmount) / 100
         return interestAmount
     
     def __str__(self):
         output = "Account Id: " + self.accountId
-        output += "\nCustomer Id: " + self.customerLoginId
+        output += "\nCustomer Login Id: " + self.customerLoginId
         output += "\nAccount Type: " + self.accountType.title()
-        output += "\nAccount Balance: " + self.currency + str(self.accountBalance)
+        output += "\nAccount Balance: " + currencySymbol + str(self.accountBalance)
         output += "\nApply Interest?: " + self.applyInterest
-        output += "\nCurrent Month's interest: " + str(self.calculateInterestAmount())
+        output += "\nCurrent Month's interest: " + currencySymbol + str(self.calculateInterestAmount())
         output += "\nAccount Created On: " + self.creationDate
         
         return output
@@ -208,17 +225,21 @@ class currentAccount(account):
                 return False
 
     def calculateInterestAmount(self):
-        interestAmount = ( self.accountBalance * self.interestRate * (1 / 12) )
+        P = float(self.accountBalance)     ;# current Account balance
+        R = float(self.interestRate) / 100     ;# interest rate
+        T = 1 / 12  ; # 1 month of 12 months in a year
+        interestAmount = ( P * R * T )
+        interestAmount = math.trunc(100 * interestAmount) / 100
         return interestAmount
     
     def __str__(self):
         output = "Account Id: " + self.accountId
-        output += "\nCustomer Id: " + self.customerLoginId
+        output += "\nCustomer Login Id: " + self.customerLoginId
         output += "\nAccount Type: " + self.accountType.title()
-        output += "\nAccount Balance: " + self.currency + str(self.accountBalance)
-        output += "\nOverdraft allowed: " + self.currency + str(self.overdraftAmount)
+        output += "\nAccount Balance: " + currencySymbol + str(self.accountBalance)
+        output += "\nOverdraft allowed: " + currencySymbol + str(self.overdraftAmount)
         output += "\nApply Interest?: " + self.applyInterest
-        output += "\nCurrent Month's interest: " + self.currency + str(self.calculateInterestAmount())
+        output += "\nCurrent Month's interest: " + currencySymbol + str(self.calculateInterestAmount())
         output += "\nAccount Created On: " + self.creationDate
                 
         return output
@@ -241,12 +262,12 @@ class mortgageAccount(account):
     
     def __str__(self):
         output = "Account Id: " + self.accountId
-        output += "\nCustomer Id: " + self.customerLoginId
+        output += "\nCustomer Login Id: " + self.customerLoginId
         output += "\nAccount Type: " + self.accountType.title()
-        output += "\nAccount Balance: " + self.currency + str(self.accountBalance)
+        output += "\nAccount Balance: " + currencySymbol + str(self.accountBalance)
         output += "\nAccount Created On: " + self.creationDate
 
-        output += "\nMortgage Principal: " + str(self.mortgagePrincipal)
+        output += "\nMortgage Principal: " + currencySymbol + str(self.mortgagePrincipal)
         output += "\nMortgage Term : " + str(self.mortgageTerm) + "years"
         output += "\nnMortgage Repayment Account: " + self.repaymentAccount
         output += "\nnMortgage Rate: " + self.mortgageInterestRate
