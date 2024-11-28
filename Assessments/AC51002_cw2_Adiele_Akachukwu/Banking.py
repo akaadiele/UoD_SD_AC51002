@@ -151,7 +151,7 @@ class savingsAccount(account):
         self.accountType = "savings account"
         self.applyInterest = applyInterest.upper()
         if (self.applyInterest == "Y"):
-            self.interestRate = 4
+            self.interestRate = 3
         
     def saveAccountState(self, accountsDirectory):
         overdraftAmount = mortgagePrincipal = mortgageTerm = ''
@@ -201,7 +201,7 @@ class currentAccount(account):
         self.accountType = "current account"
         self.applyInterest = applyInterest.upper()
         if (self.applyInterest == "Y"):
-            self.interestRate = 4
+            self.interestRate = 3
         
         self.overdraftAmount = 100
 
@@ -251,29 +251,32 @@ class mortgageAccount(account):
         super().__init__(accountId, customerLoginId, accountType, currency, accountBalance, creationDate)
         
         self.accountType = "mortgage account"
-        self.mortgagePrincipal = mortgagePrincipal
+        self.mortgagePrincipal = int(mortgagePrincipal)
         self.mortgageTerm = int(mortgageTerm)
         self.repaymentAccount = repaymentAccount
         
         if (self.mortgageTerm <= 2):
-            self.mortgageInterestRate = 5
+            self.mortgageInterestRate = 4
         else:
             self.mortgageInterestRate = 6
     
-    def __str__(self):
-        output = "Account Id: " + self.accountId
-        output += "\nCustomer Login Id: " + self.customerLoginId
-        output += "\nAccount Type: " + self.accountType.title()
-        output += "\nAccount Balance: " + currencySymbol + str(self.accountBalance)
-        output += "\nAccount Created On: " + self.creationDate
+    def calculateInterestAmount(self):
+        P = float(self.mortgagePrincipal)
+        R = float(self.mortgageInterestRate) / 100
+        T = float(self.mortgageTerm)
+        interestAmount = ( P * R * T )
+        interestAmount = math.trunc(100 * interestAmount) / 100
+        return interestAmount
 
-        output += "\nMortgage Principal: " + currencySymbol + str(self.mortgagePrincipal)
-        output += "\nMortgage Term : " + str(self.mortgageTerm) + "years"
-        output += "\nnMortgage Repayment Account: " + self.repaymentAccount
-        output += "\nnMortgage Rate: " + self.mortgageInterestRate
+    def calculateRepaymentAmount(self):
+        P = float(self.mortgagePrincipal)
+        A = float(self.calculateInterestAmount())
+        T = float(self.mortgageTerm)
         
-        return output
-
+        repaymentAmount = ( (P + A) / T)
+        repaymentAmount = math.trunc(100 * repaymentAmount) / 100
+        return repaymentAmount
+        
     def saveAccountState(self, accountsDirectory):
         applyInterest = interestRate = overdraftAmount = ''
         
@@ -291,6 +294,24 @@ class mortgageAccount(account):
         except FileNotFoundError:
                 return False
 
+    
+    def __str__(self):
+        output = "Account Id: " + self.accountId
+        output += "\nCustomer Login Id: " + self.customerLoginId
+        output += "\nAccount Type: " + self.accountType.title()
+        # output += "\nAccount Balance: " + currencySymbol + str(self.accountBalance)
+        output += "\nMortgage Principal: " + currencySymbol + str(self.mortgagePrincipal)
+        output += "\nMortgage Term : " + str(self.mortgageTerm) + "years"
+        output += "\nMortgage Repayment Account: " + self.repaymentAccount
+        output += "\nMortgage Rate: " + self.mortgageInterestRate
+        output += "\nAccount Created On: " + self.creationDate
+        
+        # output += "\n\nNote: An interest amount of " + currencySymbol + str(self.calculateInterestAmount()) + " will be deducted (when interest is applied to savings accounts) "
+        monthlyRepaymentAmount = math.trunc(100 * (self.calculateRepaymentAmount() / 12) ) / 100
+        output += "\n\nNote: A monthly capital repayment amount of '"+ currencySymbol + str(monthlyRepaymentAmount) +"' \nwould be deducted from your repayment account ("+ self.repaymentAccount +")"
+
+        
+        return output
 
 # ---------------------------------------------------------------------------------------
 

@@ -19,35 +19,41 @@
 
 # Importing Libraries
 import Banking ; # Bank Maximus 'Banking' class
-import os, sys, time, datetime  ; # Python libraries
+import os, sys, time, datetime, math  ; # Python libraries
 
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
+# Get the root directory for the location of python program
+baseDirectory = os.path.dirname(os.path.abspath(__file__)) + "/Bank_Maximus/"
+customersDirectory = baseDirectory + "/Customers/"
+accountsDirectory = baseDirectory + "/Accounts/"
+try:
+    # Redundancy check to create directories if they do not exist
+    os.makedirs(baseDirectory)
+    os.makedirs(customersDirectory)
+    os.makedirs(accountsDirectory)
+except FileExistsError:
+    # directory already exists
+    pass
+
+# Declare global variables
+currencySymbol = "£" ; returnVal = ''
+todayDay = datetime.datetime.now().day
+todayMonth = datetime.datetime.now().month
+todayYear = datetime.datetime.now().year
+# ---------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------
+
 # Save bank account info
 def storeAccountInfo(accountObject):
     saveState = accountObject.saveAccountState(accountsDirectory)
     if (saveState):
-        print("\nAccount updated successfully")
+        # print("\nAccount updated successfully")
         return accountObject
     else:
         print("\n***! Account updated failed")
         return False
         
-    # fileName = accountsDirectory  + accountObject.accountId +".txt"
-    
-    # fileContent = accountObject.accountId + "," + accountObject.customerLoginId + "," + accountObject.accountType \
-    #     + "," + accountObject.currency + "," + accountObject.accountBalance + "," + accountObject.creationDate \
-    #         + "," + accountObject.accountStatus + "," + accountObject.applyInterest + "," + accountObject.interestRate \
-    #             + "," + accountObject.overdraftAmount + "," + accountObject.mortgagePrincipal + "," + accountObject.mortgageTerm \
-    #                 + "," + accountObject.repaymentAccount + "," + accountObject.mortgageInterestRate
-    # try:
-    #     with open( fileName, "w", encoding="UTF-8" ) as openedFile:
-    #         openedFile.write(fileContent)  ; # Write to update on the file
-    #         print("\nAccount created successfully")
-    #         return True
-    # except FileNotFoundError:
-    #         print("\nAccount creation failed")
-    #         return False
     
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
@@ -89,7 +95,7 @@ def getAccountInfo(accountId):
 def storeCustomerInfo(customerObject):
     saveState = customerObject.saveCustomerState(customersDirectory)
     if (saveState):
-        print("\nCustomer updated successfully")
+        # print("\nCustomer updated successfully")
         return customerObject
     else:
         print("\n***! Customer updated failed")
@@ -125,20 +131,36 @@ def viewAllAccountsForCustomer(customerObject):
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
 def accountMenu(accountId):
-    print("\n----------------------------------")
-    print("1 - View account balance")
-    print("2 - Make a deposit")
-    print("3 - Make a withdrawal")
-    print("4 - View account state")
-    print("# - Return to customer menu \n \n")
-    inputValue = input(">>> ")
+    accountObject = getAccountInfo(accountId)
+    
+    print("\n\n----------------------------------")
+    
+    if (accountObject.accountType != "mortgage account"):
+        print("1 - View account balance")
+        print("2 - Make a deposit")
+        print("3 - Make a withdrawal")
+        print("4 - View account state")
+        print("# - Return to customer menu \n \n")
+        inputValue = input(">>> ")
+    else:
+        print("1 - View account state")
+        print("# - Return to customer menu \n \n")
+        inputValue = input(">>> ")
+        
+        if (inputValue == '1'):
+            inputValue = '4'
+        elif (inputValue == '#'):
+            inputValue = '#'
+        else:
+            inputValue = ''
+    
 
     match inputValue:
         case '1':
+            print("\n----------------------------------\n")
             accountObject = getAccountInfo(accountId)
             if (accountObject != False):
                 accountBalance = accountObject.accountBalance
-                print("\n----------------------------------")
                 print(f"Your account balance is {currencySymbol}{accountBalance}")
                 print("----------------------------------")
             else:
@@ -148,6 +170,7 @@ def accountMenu(accountId):
             accountMenu(accountId)
                     
         case '2':
+            print("\n----------------------------------\n")
             print("Enter amount to deposit (or '#' to return): ")
             inputValue = input(">>> ")
             
@@ -158,8 +181,8 @@ def accountMenu(accountId):
                     depositAmount = float(inputValue)                
                     accountObject = getAccountInfo(accountId)
                     if (accountObject.deposit(depositAmount) == True):
-                        print(f"\Deposit of {currencySymbol}{depositAmount} was successful")
-                        print(f"New account balance is {accountObject.accountBalance}")
+                        print(f"\nDeposit of {currencySymbol}{depositAmount} was successful")
+                        print(f"\nNew account balance is {accountObject.accountBalance}")
 
                         storeAccountInfo(accountObject)
                 except ValueError:
@@ -169,6 +192,7 @@ def accountMenu(accountId):
             accountMenu(accountId)
             
         case '3':
+            print("\n----------------------------------\n")
             print("Enter amount to withdraw (or '#' to return): ")
             inputValue = input(">>> ")
             
@@ -180,7 +204,7 @@ def accountMenu(accountId):
                     accountObject = getAccountInfo(accountId)
                     if ( accountObject.withdraw(withdrawalAmount) == True):
                         print(f"\nWithdrawal of {currencySymbol}{withdrawalAmount} was successful")
-                        print(f"New account balance is {accountObject.accountBalance}")
+                        print(f"\nNew account balance is {accountObject.accountBalance}")
                         
                         storeAccountInfo(accountObject)
                 except ValueError:
@@ -190,9 +214,9 @@ def accountMenu(accountId):
             accountMenu(accountId)
             
         case '4':
+            print("\n----------------------------------\n")
             accountObject = getAccountInfo(accountId)
             if (accountObject != False):
-                print("\n----------------------------------")
                 print(accountObject)
                 print("----------------------------------")
             else:
@@ -202,6 +226,7 @@ def accountMenu(accountId):
             accountMenu(accountId)
 
         case '#':
+            print("\n----------------------------------\n")
             time.sleep(1)
         
         case _:
@@ -235,27 +260,69 @@ def createAccount(customerObject):
     
     if (accountType == '1'):
         # Creating savings account
-        applyInterest = input("Apply Interest? (Y/N): ")
+        print("\n----------------------------------")
+        applyInterest = input("\nWould you like apply interest? (Y/N): ")
         
         accountObject = Banking.savingsAccount(accountId, customerLoginId, accountType, currency, accountBalance, creationDate, applyInterest)
         accountStatus = accountObject.accountStatus
     elif (accountType == '2'):
         # Creating Current account
-        applyInterest = input("Apply Interest? (Y/N): ")
+        print("\n----------------------------------")
+        applyInterest = input("\nWould you like apply interest? (Y/N): ")
         
         accountObject = Banking.currentAccount(accountId, customerLoginId, accountType, currency, accountBalance, creationDate, applyInterest)
         accountStatus = accountObject.accountStatus
     elif (accountType == '3'):
         # Creating mortgage account
+        print("\n----------------------------------")
         if ( len(customerObject.customerAccountsList) != 0):
-            mortgagePrincipal = input("Enter mortgage principal amount: ")
-            mortgageTerm = input("Enter mortgage term (years): ")
-            repaymentAccount = input("Enter occupation: ")
             
-            accountObject = Banking.mortgageAccount(accountId, customerLoginId, accountType, currency, accountBalance, creationDate, mortgagePrincipal, mortgageTerm, repaymentAccount)
-            accountStatus = accountObject.accountStatus
+            accountCount = 0 ; hasCurrentAccount = '' ; currentAccountsList = []
+            for account in customerObject.customerAccountsList:
+                accountObject = getAccountInfo(account)
+                if (accountObject.accountType == "current account"):
+                    currentAccountsList.append(customerObject.customerAccountsList[accountCount])
+                    hasCurrentAccount = 'Y'
+                accountCount += 1
+            
+            if (hasCurrentAccount == 'Y'):
+                print("\nSelect one of the below current accounts as your 'Repayment Account' : ")
+                accountCount = 1
+                for account in currentAccountsList:
+                    print(f"{accountCount} - {account}")
+                    accountCount += 1
+                    
+                print("\nEnter corresponding code to select an account : ")
+                inputValue = input(">>> ")
+                
+                try:
+                    repaymentAccount = currentAccountsList[int(inputValue) - 1]
+                except IndexError:
+                    print("\n***! Invalid input")
+            else:
+                print("\n***! Kindly note, you must have at least one current account with us to proceed.")
+                print("\n***! Account creation failed")
+                time.sleep(1)
+                return False
+            
+            if (repaymentAccount != ''):
+                mortgagePrincipal = input("\nEnter mortgage principal amount: ")
+                mortgageTerm = input("\nEnter mortgage term (years): ")
+                
+                accountObject = Banking.mortgageAccount(accountId, customerLoginId, accountType, currency, accountBalance, creationDate, mortgagePrincipal, mortgageTerm, repaymentAccount)
+                accountStatus = accountObject.accountStatus
+                
+                monthlyRepaymentAmount = math.trunc(100 * (accountObject.calculateRepaymentAmount() / 12) ) / 100
+                print(f"\n\nNote: A monthly capital repayment amount of '{currencySymbol}{monthlyRepaymentAmount}' \nwould be deducted from your repayment account ({accountObject.repaymentAccount})")
+
+            else:
+                print("\n***! Kindly note, you must have at least an existing current account with us to proceed.")
+                print("\n***! Account creation failed")
+                time.sleep(1)
+                return False
+            
         else:
-            print("\n***! Kindly note, you must have an existing current account with us to proceed.")
+            print("\n***! Kindly note, you must have at least an existing current account with us to proceed.")
             print("\n***! Account creation failed")
             time.sleep(1)
             return False
@@ -267,18 +334,18 @@ def createAccount(customerObject):
     
     if (accountStatus == "active"):
         returnVal = storeAccountInfo(accountObject)
+        time.sleep(1)
         return returnVal
     else:
         print("\n***! Account creation failed")
+        time.sleep(1)
         return False
-
-    time.sleep(1)
 
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
 # <description>
 def adminMenu():
-    print("\n----------------------------------")
+    print("\n\n----------------------------------")
     print("1 - View Customers")
     print("2 - View Accounts")
     print("# - Return to Home menu \n \n")
@@ -286,9 +353,11 @@ def adminMenu():
     
     match inputValue:
         case '1':
+            print("\n----------------------------------\n")
             customersCount = 1
             fileNames = next(os.walk(customersDirectory), (None, None, []))[2]  # [] if no file
             if (fileNames):
+                print("Customers: ")
                 for fileName in fileNames:
                     customerLoginId = fileName.split(".txt")[0]
                     print(f"{customersCount} - {customerLoginId}")
@@ -316,9 +385,11 @@ def adminMenu():
             adminMenu()
             
         case '2':
+            print("\n----------------------------------\n")
             accountsCount = 1
             fileNames = next(os.walk(accountsDirectory), (None, None, []))[2]  # [] if no file
             if (fileNames):
+                print("Accounts:")
                 for fileName in fileNames:
                     accountId = fileName.split(".txt")[0]
                     print(f"{accountsCount} - {accountId}")
@@ -347,6 +418,7 @@ def adminMenu():
             adminMenu()
 
         case '#':
+            print("\n----------------------------------\n")
             time.sleep(1)
             homeMenu()
         
@@ -392,7 +464,7 @@ def customerMenu(customerFile):
         loggedInCustomer.customerAccountsList = accountsList.split('|')
     numberOfAccounts = len(loggedInCustomer.customerAccountsList)
     
-    print("\n----------------------------------")
+    print("\n\n----------------------------------")
     print(f"Hello {loggedInCustomer.firstName.title()},")
     print("----------------------------------\n")
     print("1 - Accounts list")
@@ -403,7 +475,9 @@ def customerMenu(customerFile):
     
     match inputValue:
         case '1':
+            print("\n----------------------------------\n")
             if ( numberOfAccounts != 0):
+                print("Accounts:")
                 accountCount = 1
                 for account in loggedInCustomer.customerAccountsList:
                     # accountId = account.split(".txt")[0]
@@ -415,7 +489,6 @@ def customerMenu(customerFile):
                     if (inputValue == '#'):
                         pass
                     else:
-                        print("\n----------------------------------")
                         returnVal = accountMenu(loggedInCustomer.customerAccountsList[int(inputValue) - 1])
                 except IndexError:
                     print("\n***! Invalid input")
@@ -426,8 +499,11 @@ def customerMenu(customerFile):
             customerMenu(customerFile)
             
         case '2':
+            print("\n----------------------------------\n")
             returnVal = createAccount(loggedInCustomer)
             if(returnVal != False):
+                print("\nAccount created successfully\n")
+                
                 if ( numberOfAccounts == 0):
                     loggedInCustomer.customerAccountsList = returnVal.accountId
                 else:
@@ -443,6 +519,7 @@ def customerMenu(customerFile):
                 customerMenu(customerFile)
             
         case '3':
+            print("\n----------------------------------\n")
             if ( numberOfAccounts != 0):
                 viewAllAccountsForCustomer(loggedInCustomer)
             else:
@@ -452,6 +529,7 @@ def customerMenu(customerFile):
             customerMenu(customerFile)
 
         case '#':
+            print("\n----------------------------------\n")
             time.sleep(1)
             homeMenu()
         
@@ -463,7 +541,7 @@ def customerMenu(customerFile):
 # ---------------------------------------------------------------------------------------------------
 # <description>
 def customerLogin():
-    print("\n----------------------------------")
+    print("\n\n----------------------------------")
     idInput = input("Enter your Customer Login ID: ")
     passwordInput = input("Enter your Customer password: ")
 
@@ -549,9 +627,9 @@ def registerCustomer():
 # <description>
 def homeMenu():
     print("\n----------------------------------")
-    print("\nWelcome to Bank Maximus \n")
-    print("1 - Login existing customer")
-    print("2 - Register new customer")
+    print("\nWelcome to 'Bank Maximus' \n")
+    print("1 - Login as existing customer")
+    print("2 - Register as a new customer")
     print("3 - Switch to Admin Menu")
     print("# - Exit Application \n \n")
     inputValue = input(">>> ")
@@ -573,7 +651,9 @@ def homeMenu():
             homeMenu()
         
         case '#':
+            print("\n----------------------------------")
             print("\n***! Exiting !***\n")
+            print("----------------------------------\n")
             time.sleep(3)
             sys.exit()
         
@@ -584,26 +664,8 @@ def homeMenu():
 
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
-
-# Get the root directory for the location of python program
-baseDirectory = os.path.dirname(os.path.abspath(__file__)) + "/Bank_Maximus/"
-customersDirectory = baseDirectory + "/Customers/"
-accountsDirectory = baseDirectory + "/Accounts/"
-try:
-    # Redundancy check to create directories if they do not exist
-    os.makedirs(baseDirectory)
-    os.makedirs(customersDirectory)
-    os.makedirs(accountsDirectory)
-except FileExistsError:
-    # directory already exists
-    pass
-
-currencySymbol = "£"
-returnVal = ''
-
-todayDay = datetime.datetime.now().day
-todayMonth = datetime.datetime.now().month
-todayYear = datetime.datetime.now().year
-
-
+# Launch the home menu
 homeMenu()
+
+# ---------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------

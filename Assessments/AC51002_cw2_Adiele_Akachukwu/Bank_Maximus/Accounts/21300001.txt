@@ -1,1 +1,1 @@
-21300001,aka,savings account,GBP,170.0,20/11/2024,active,Y,4,,,,,
+21300001,aka,savings account,GBP,150.0,27/11/2024,active,Y,4,,,,,
