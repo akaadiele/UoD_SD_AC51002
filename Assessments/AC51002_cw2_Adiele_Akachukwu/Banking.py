@@ -6,7 +6,7 @@
 * Course Code  : AC51002 - Software Development
 * Title   : Assignment 2 - Program 2 Banking application
 * Developed By : Adiele Akachukwu
-* Date Created : --, November --, 2024
+* Date Created : 29th November, 2024
 *
 * Bank Name - Bank Maximus
 *
@@ -18,14 +18,17 @@
 # ---------------------------------------------------------------------------------------------------
 
 # Importing Libraries
-import os, math
+import os, math  ; # Python libraries used in program
 
-# Global variables
+# Declaring global variables
 currencySymbol = "£"
 
 # ---------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
 class customer():
+    # Function to define what happens when a new object is created for this class
     def __init__(self, firstName, lastName, dateOfBirth, phone, email, occupation, customerLoginId, customerPassword, creationDate):
+        # Initializing class 'self' variables
         self.firstName = firstName.lower()
         self.lastName = lastName.lower()
         self.dateOfBirth = dateOfBirth
@@ -39,12 +42,15 @@ class customer():
         self.status = "Created"
         self.customerAccountsList = ''
 
+    # Generating a unique id for bank customer 
     def generateCustomerId(self, customersDirectory):
-        existingCustomersList = next(os.walk(customersDirectory), (None, None, []))[2]  # [] if no file
+        existingCustomersList = next(os.walk(customersDirectory), (None, None, []))[2]  # walking through the directory contents
         self.customerId = '1' + str(len(existingCustomersList) + 1).zfill(5)
         
+    # Saving customer data to text file
     def saveCustomerState(self, customersDirectory):
-        fileName = customersDirectory  + self.customerLoginId +".txt"
+        fileName = customersDirectory  + self.customerLoginId +".txt"  ; # File name for customer file
+        
         fileContent = self.firstName + "," + self.lastName + "," + self.dateOfBirth \
             + "," + self.phone + "," + self.email + "," + self.occupation \
                 + "," + self.customerLoginId + "," + self.customerPassword \
@@ -54,26 +60,32 @@ class customer():
                 openedFile.write(fileContent)  ; # Write to update on the file
                 return True
         except FileNotFoundError:
-                return False
+            # Handing possible exceptions
+            return False
             
+    # Function to override the '__str__' function
     def __str__(self):
         # output = "\nHello " + self.firstName.title() +", here are your details: \n\n"
-        output = "\nName: " + self.firstName.title() +' '+ self.lastName.title() +" \n"
-        output += "Date of Birth: " + self.dateOfBirth +" \n"
-        output += "Phone: " + self.phone +" \n"
-        output += "Email: " + self.email +" \n"
-        output += "Occupation: " + self.occupation.title() +" \n"
-        output += "Login Id: " + self.customerLoginId +" \n"
-        output += "Joined: " + self.creationDate +" \n"
-        output += "Accounts: " + str(self.customerAccountsList) +" \n"
+        output = "\nCustomer ID: " + str(self.customerId) 
+        output += "\nName: " + self.firstName.title() +' '+ self.lastName.title() 
+        output += "\nDate of Birth: " + self.dateOfBirth 
+        output += "\nPhone: " + self.phone 
+        output += "\nEmail: " + self.email 
+        output += "\nOccupation: " + self.occupation.title() 
+        output += "\nLogin Id: " + self.customerLoginId 
+        output += "\nJoined: " + self.creationDate 
+        output += "\nAccounts: " + str(self.customerAccountsList) 
+        output += "\n"
         
         return output
-    
-    
+
 # ---------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------
+
 class account():
+    # Function to define what happens when a new object is created for this class
     def __init__(self, accountId, customerLoginId, accountType, currency, accountBalance, creationDate):
+        # Initializing class 'self' variables
         self.accountId = accountId
         self.customerLoginId = customerLoginId
         self.accountType = accountType
@@ -84,10 +96,12 @@ class account():
         self.accountStatus = "active"
         
         if (self.accountBalance > 0):
-            self.accountBalance = math.trunc(100 * self.accountBalance) / 100
+            self.accountBalance = math.trunc(100 * self.accountBalance) / 100   ; # formatting the amount value to 2 decimal points
 
+    # Function to execute a deposit on a bank account
     def deposit(self, depositAmount):
         try:
+            # Checking the amount to be deposited
             if (depositAmount > 0):
                 self.accountBalance += depositAmount
                 return True
@@ -95,12 +109,16 @@ class account():
                 print("\n***! Invalid amount entered")
                 return False
         except ValueError:
+            # Handing possible exceptions
             print("\n***! Invalid amount entered")
             return False
 
+    # Function to execute a withdrawal on a bank account
     def withdraw(self, withdrawalAmount):
         try:
+            # Checking the amount to be withdrawn
             if (withdrawalAmount > 0):
+                # Checking for available funds to deduct the withdrawal amount
                 if (self.accountBalance >= withdrawalAmount):
                     self.accountBalance -= withdrawalAmount
                     return True
@@ -111,15 +129,17 @@ class account():
                 print("\n***! Invalid amount entered")
                 return False
         except ValueError:
+            # Handing possible exceptions
             print("\n***! Invalid amount entered")
             return False
 
-
+    # Saving account data to text file
     def saveAccountState(self, accountsDirectory):
+        # Setting to blank for variables not needed in this account type
         applyInterest = interestRate = overdraftAmount = mortgagePrincipal = ''
         mortgageTerm = repaymentAccount = repaymentAccount = mortgageInterestRate = ''
         
-        fileName = accountsDirectory  + self.accountId +".txt"
+        fileName = accountsDirectory  + self.accountId +".txt"  ; # File name for account file
         
         fileContent = self.accountId + "," + self.customerLoginId + "," + self.accountType \
             + "," + self.currency + "," + str(self.accountBalance) + "," + self.creationDate \
@@ -131,33 +151,41 @@ class account():
                 openedFile.write(fileContent)  ; # Write to update on the file
                 return True
         except FileNotFoundError:
-                return False
+            # Handing possible exceptions
+            return False
 
+    # Function to override the '__str__' function
     def __str__(self):
-        output = "Account Id: " + self.accountId
+        output = "\nAccount Id: " + self.accountId
         output += "\nCustomer Login Id: " + self.customerLoginId
         output += "\nAccount Type: " + self.accountType.title()
         output += "\nAccount Balance: " + currencySymbol + str(self.accountBalance)
-        output += "\nAccount Created On: " + self.creationDate
+        output += "\nAccount Created On: " + self.creationDate 
+        output += "\n"
         
         return output
     
 # ---------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
 
 class savingsAccount(account):
+    # Function to define what happens when a new object is created for this class
     def __init__(self, accountId, customerLoginId, accountType, currency, accountBalance, creationDate, applyInterest):
         super().__init__(accountId, customerLoginId, accountType, currency, accountBalance, creationDate)
         
+        # Initializing class 'self' variables
         self.accountType = "savings account"
         self.applyInterest = applyInterest.upper()
         if (self.applyInterest == "Y"):
             self.interestRate = 3
         
+    # Saving account data to text file for 'savings account'
     def saveAccountState(self, accountsDirectory):
+        # Setting to blank for variables not needed in this account type
         overdraftAmount = mortgagePrincipal = mortgageTerm = ''
         repaymentAccount = mortgageInterestRate = ''
         
-        fileName = accountsDirectory  + self.accountId +".txt"
+        fileName = accountsDirectory  + self.accountId +".txt"  ; # File name for account file
         
         fileContent = self.accountId + "," + self.customerLoginId + "," + self.accountType \
             + "," + self.currency + "," + str(self.accountBalance) + "," + self.creationDate \
@@ -169,48 +197,54 @@ class savingsAccount(account):
                 openedFile.write(fileContent)  ; # Write to update on the file
                 return True
         except FileNotFoundError:
-                return False
+            # Handing possible exceptions
+            return False
 
+    # Function to calculate the interest amount for the current month
     def calculateInterestAmount(self):
-        P = float(self.accountBalance)     ;# current Account balance
-        R = float(self.interestRate) / 100     ;# interest rate
-        T = 1 / 12  ; # 1 month of 12 months in a year
-        interestAmount = ( P * R * T )
-        interestAmount = math.trunc(100 * interestAmount) / 100
+        principal = float(self.accountBalance)     ;# Account balance
+        rate = float(self.interestRate) / 100     ;# interest rate
+        time = 1 / 12  ; # 1 month of 12 months in a year
+        interestAmount = ( principal * rate * time )
+        interestAmount = math.trunc(100 * interestAmount) / 100   ; # formatting the amount value to 2 decimal points
         return interestAmount
     
+    # Function to override the '__str__' function
     def __str__(self):
-        output = "Account Id: " + self.accountId
+        output = "\nAccount Id: " + self.accountId
         output += "\nCustomer Login Id: " + self.customerLoginId
         output += "\nAccount Type: " + self.accountType.title()
         output += "\nAccount Balance: " + currencySymbol + str(self.accountBalance)
         output += "\nApply Interest?: " + self.applyInterest
         output += "\nCurrent Month's interest: " + currencySymbol + str(self.calculateInterestAmount())
-        output += "\nAccount Created On: " + self.creationDate
+        output += "\nAccount Created On: " + self.creationDate 
+        output += "\n"
         
         return output
 
-
-
+# ---------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------
 
 class currentAccount(account):
+    # Function to define what happens when a new object is created for this class
     def __init__(self, accountId, customerLoginId, accountType, currency, accountBalance, creationDate, applyInterest):
         super().__init__(accountId, customerLoginId, accountType, currency, accountBalance, creationDate)
         
+        # Initializing class 'self' variables
         self.accountType = "current account"
         self.applyInterest = applyInterest.upper()
         if (self.applyInterest == "Y"):
-            self.interestRate = 3
+            self.interestRate = 2
         
         self.overdraftAmount = 100
 
-
+    # Saving account data to text file for 'current account'
     def saveAccountState(self, accountsDirectory):
+        # Setting to blank for variables not needed in this account type
         mortgagePrincipal = mortgageTerm = ''
         repaymentAccount = mortgageInterestRate = ''
         
-        fileName = accountsDirectory  + self.accountId +".txt"
+        fileName = accountsDirectory  + self.accountId +".txt"  ; # File name for account file
         
         fileContent = self.accountId + "," + self.customerLoginId + "," + self.accountType \
             + "," + self.currency + "," + str(self.accountBalance) + "," + self.creationDate \
@@ -222,34 +256,41 @@ class currentAccount(account):
                 openedFile.write(fileContent)  ; # Write to update on the file
                 return True
         except FileNotFoundError:
-                return False
+            # Handing possible exceptions
+            return False
 
+    # Function to calculate the interest amount for the current month
     def calculateInterestAmount(self):
-        P = float(self.accountBalance)     ;# current Account balance
-        R = float(self.interestRate) / 100     ;# interest rate
-        T = 1 / 12  ; # 1 month of 12 months in a year
-        interestAmount = ( P * R * T )
-        interestAmount = math.trunc(100 * interestAmount) / 100
+        principal = float(self.accountBalance)     ;# Account balance
+        rate = float(self.interestRate) / 100     ;# interest rate
+        time = 1 / 12  ; # 1 month of 12 months in a year
+        interestAmount = ( principal * rate * time )
+        interestAmount = math.trunc(100 * interestAmount) / 100   ; # formatting the amount value to 2 decimal points
         return interestAmount
     
+    # Function to override the '__str__' function
     def __str__(self):
-        output = "Account Id: " + self.accountId
+        output = "\nAccount Id: " + self.accountId
         output += "\nCustomer Login Id: " + self.customerLoginId
         output += "\nAccount Type: " + self.accountType.title()
         output += "\nAccount Balance: " + currencySymbol + str(self.accountBalance)
         output += "\nOverdraft allowed: " + currencySymbol + str(self.overdraftAmount)
         output += "\nApply Interest?: " + self.applyInterest
         output += "\nCurrent Month's interest: " + currencySymbol + str(self.calculateInterestAmount())
-        output += "\nAccount Created On: " + self.creationDate
+        output += "\nAccount Created On: " + self.creationDate 
+        output += "\n"
                 
         return output
 
 # ---------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
 
 class mortgageAccount(account):
+    # Function to define what happens when a new object is created for this class
     def __init__(self, accountId, customerLoginId, accountType, currency, accountBalance, creationDate, mortgagePrincipal, mortgageTerm, repaymentAccount):
         super().__init__(accountId, customerLoginId, accountType, currency, accountBalance, creationDate)
         
+        # Initializing class 'self' variables
         self.accountType = "mortgage account"
         self.mortgagePrincipal = int(mortgagePrincipal)
         self.mortgageTerm = int(mortgageTerm)
@@ -260,27 +301,30 @@ class mortgageAccount(account):
         else:
             self.mortgageInterestRate = 6
     
+    # Function to calculate the mortgage interest amount for the tenure of the mortgage
     def calculateInterestAmount(self):
-        P = float(self.mortgagePrincipal)
-        R = float(self.mortgageInterestRate) / 100
-        T = float(self.mortgageTerm)
-        interestAmount = ( P * R * T )
-        interestAmount = math.trunc(100 * interestAmount) / 100
+        principal = float(self.mortgagePrincipal)
+        rate = float(self.mortgageInterestRate) / 100
+        time = float(self.mortgageTerm)
+        interestAmount = ( principal * rate * time )
+        interestAmount = math.trunc(100 * interestAmount) / 100   ; # formatting the amount value to 2 decimal points
         return interestAmount
 
     def calculateRepaymentAmount(self):
-        P = float(self.mortgagePrincipal)
-        A = float(self.calculateInterestAmount())
-        T = float(self.mortgageTerm)
+        principal = float(self.mortgagePrincipal)
+        interestAmount = float(self.calculateInterestAmount())
+        time = float(self.mortgageTerm)
         
-        repaymentAmount = ( (P + A) / T)
-        repaymentAmount = math.trunc(100 * repaymentAmount) / 100
+        repaymentAmount = ( (principal + interestAmount) / time)
+        repaymentAmount = math.trunc(100 * repaymentAmount) / 100   ; # formatting the amount value to 2 decimal points
         return repaymentAmount
         
+    # Saving account data to text file for 'mortgage account'
     def saveAccountState(self, accountsDirectory):
+        # Setting to blank for variables not needed in this account type
         applyInterest = interestRate = overdraftAmount = ''
         
-        fileName = accountsDirectory  + self.accountId +".txt"
+        fileName = accountsDirectory  + self.accountId +".txt"  ; # File name for account file
         
         fileContent = self.accountId + "," + self.customerLoginId + "," + self.accountType \
             + "," + self.currency + "," + str(self.accountBalance) + "," + self.creationDate \
@@ -292,11 +336,12 @@ class mortgageAccount(account):
                 openedFile.write(fileContent)  ; # Write to update on the file
                 return True
         except FileNotFoundError:
-                return False
+            # Handing possible exceptions
+            return False
 
-    
+    # Function to override the '__str__' function
     def __str__(self):
-        output = "Account Id: " + self.accountId
+        output = "\nAccount Id: " + self.accountId
         output += "\nCustomer Login Id: " + self.customerLoginId
         output += "\nAccount Type: " + self.accountType.title()
         # output += "\nAccount Balance: " + currencySymbol + str(self.accountBalance)
@@ -307,8 +352,9 @@ class mortgageAccount(account):
         output += "\nAccount Created On: " + self.creationDate
         
         # output += "\n\nNote: An interest amount of " + currencySymbol + str(self.calculateInterestAmount()) + " will be deducted (when interest is applied to savings accounts) "
-        monthlyRepaymentAmount = math.trunc(100 * (self.calculateRepaymentAmount() / 12) ) / 100
+        monthlyRepaymentAmount = math.trunc(100 * (self.calculateRepaymentAmount() / 12) ) / 100   ; # formatting the amount value to 2 decimal points
         output += "\n\nNote: A monthly capital repayment amount of '"+ currencySymbol + str(monthlyRepaymentAmount) +"' \nwould be deducted from your repayment account ("+ self.repaymentAccount +")"
+        output += " \n"
 
         
         return output

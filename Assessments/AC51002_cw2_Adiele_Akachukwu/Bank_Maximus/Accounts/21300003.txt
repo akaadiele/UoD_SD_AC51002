@@ -1,1 +1,0 @@
-21300003,aka,current account,GBP,0.0,28/11/2024,active,Y,3,100,,,,
