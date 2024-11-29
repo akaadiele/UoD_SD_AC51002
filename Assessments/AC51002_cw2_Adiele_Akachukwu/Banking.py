@@ -97,13 +97,15 @@ class account():
         
         if (self.accountBalance > 0):
             self.accountBalance = math.trunc(100 * self.accountBalance) / 100   ; # formatting the amount value to 2 decimal points
+        elif (self.accountBalance == 0):
+            self.accountBalance = 0.00
 
     # Function to execute a deposit on a bank account
     def deposit(self, depositAmount):
         try:
             # Checking the amount to be deposited
             if (depositAmount > 0):
-                self.accountBalance += depositAmount
+                self.accountBalance = float(self.accountBalance) + depositAmount
                 return True
             else:
                 print("\n***! Invalid amount entered")
@@ -120,7 +122,7 @@ class account():
             if (withdrawalAmount > 0):
                 # Checking for available funds to deduct the withdrawal amount
                 if (self.accountBalance >= withdrawalAmount):
-                    self.accountBalance -= withdrawalAmount
+                    self.accountBalance = float(self.accountBalance) - withdrawalAmount
                     return True
                 else:
                     print("\n***! Insufficient funds")
@@ -157,7 +159,7 @@ class account():
     # Function to override the '__str__' function
     def __str__(self):
         output = "\nAccount Id: " + self.accountId
-        output += "\nCustomer Login Id: " + self.customerLoginId
+        # output += "\nCustomer Login Id: " + self.customerLoginId
         output += "\nAccount Type: " + self.accountType.title()
         output += "\nAccount Balance: " + currencySymbol + str(self.accountBalance)
         output += "\nAccount Created On: " + self.creationDate 
@@ -178,6 +180,8 @@ class savingsAccount(account):
         self.applyInterest = applyInterest.upper()
         if (self.applyInterest == "Y"):
             self.interestRate = 3
+        else:
+            self.interestRate = 0
         
     # Saving account data to text file for 'savings account'
     def saveAccountState(self, accountsDirectory):
@@ -202,21 +206,29 @@ class savingsAccount(account):
 
     # Function to calculate the interest amount for the current month
     def calculateInterestAmount(self):
-        principal = float(self.accountBalance)     ;# Account balance
-        rate = float(self.interestRate) / 100     ;# interest rate
-        time = 1 / 12  ; # 1 month of 12 months in a year
-        interestAmount = ( principal * rate * time )
-        interestAmount = math.trunc(100 * interestAmount) / 100   ; # formatting the amount value to 2 decimal points
-        return interestAmount
+        if (self.interestRate != 0):
+            principal = float(self.accountBalance)     ;# Account balance
+            rate = float(self.interestRate) / 100     ;# interest rate
+            time = 1 / 12  ; # 1 month of 12 months in a year
+            interestAmount = ( principal * rate * time )
+            interestAmount = math.trunc(100 * interestAmount) / 100   ; # formatting the amount value to 2 decimal points
+            return interestAmount
+        else:
+            interestAmount = 0.00
+            return interestAmount
     
     # Function to override the '__str__' function
     def __str__(self):
         output = "\nAccount Id: " + self.accountId
-        output += "\nCustomer Login Id: " + self.customerLoginId
+        # output += "\nCustomer Login Id: " + self.customerLoginId
         output += "\nAccount Type: " + self.accountType.title()
         output += "\nAccount Balance: " + currencySymbol + str(self.accountBalance)
-        output += "\nApply Interest?: " + self.applyInterest
-        output += "\nCurrent Month's interest: " + currencySymbol + str(self.calculateInterestAmount())
+        
+        # Display interest info only if interest is flagged as 'Y' and account balance is positive
+        if ( (self.applyInterest == "Y") and (float(self.accountBalance) > 0) ):
+            # output += "\nApply Interest?: " + self.applyInterest
+            output += "\nCurrent Month's interest: " + currencySymbol + str(self.calculateInterestAmount())
+        
         output += "\nAccount Created On: " + self.creationDate 
         output += "\n"
         
@@ -235,8 +247,34 @@ class currentAccount(account):
         self.applyInterest = applyInterest.upper()
         if (self.applyInterest == "Y"):
             self.interestRate = 2
+        else:
+            self.interestRate = 0
         
         self.overdraftAmount = 100
+        
+    
+    # Function to execute a withdrawal on a bank account
+    def withdraw(self, withdrawalAmount):
+        try:
+            # Checking the amount to be withdrawn
+            if (withdrawalAmount > 0):
+                # Checking for available funds to deduct the withdrawal amount
+                currentBalance = float(self.accountBalance) + float(self.overdraftAmount) ; # including available overdraft in the available balance
+                
+                if (currentBalance >= withdrawalAmount):
+                    self.accountBalance = float(self.accountBalance) - withdrawalAmount
+                    return True
+                else:
+                    print("\n***! Insufficient funds")
+                    print("***! Withdrawal exceeds available overdraft\n")
+                    return False
+            else:
+                print("\n***! Invalid amount entered")
+                return False
+        except ValueError:
+            # Handing possible exceptions
+            print("\n***! Invalid amount entered")
+            return False
 
     # Saving account data to text file for 'current account'
     def saveAccountState(self, accountsDirectory):
@@ -261,22 +299,36 @@ class currentAccount(account):
 
     # Function to calculate the interest amount for the current month
     def calculateInterestAmount(self):
-        principal = float(self.accountBalance)     ;# Account balance
-        rate = float(self.interestRate) / 100     ;# interest rate
-        time = 1 / 12  ; # 1 month of 12 months in a year
-        interestAmount = ( principal * rate * time )
-        interestAmount = math.trunc(100 * interestAmount) / 100   ; # formatting the amount value to 2 decimal points
-        return interestAmount
+        if (self.interestRate != 0):
+            principal = float(self.accountBalance)     ;# Account balance
+            rate = float(self.interestRate) / 100     ;# interest rate
+            time = 1 / 12  ; # 1 month of 12 months in a year
+            interestAmount = ( principal * rate * time )
+            interestAmount = math.trunc(100 * interestAmount) / 100   ; # formatting the amount value to 2 decimal points
+            return interestAmount
+        else:
+            interestAmount = 0.00
+            return interestAmount
     
     # Function to override the '__str__' function
     def __str__(self):
+        
+        if ( float(self.accountBalance) > 0 ):
+            availableOverdraft = float(self.overdraftAmount)
+        else:
+            availableOverdraft = float(self.overdraftAmount) + float(self.accountBalance)
+        
         output = "\nAccount Id: " + self.accountId
-        output += "\nCustomer Login Id: " + self.customerLoginId
+        # output += "\nCustomer Login Id: " + self.customerLoginId
         output += "\nAccount Type: " + self.accountType.title()
         output += "\nAccount Balance: " + currencySymbol + str(self.accountBalance)
-        output += "\nOverdraft allowed: " + currencySymbol + str(self.overdraftAmount)
-        output += "\nApply Interest?: " + self.applyInterest
-        output += "\nCurrent Month's interest: " + currencySymbol + str(self.calculateInterestAmount())
+        output += "\nAvailable Overdraft: " + currencySymbol + str(availableOverdraft)
+        
+        # Display interest info only if interest is flagged as 'Y' and account balance is positive
+        if ( (self.applyInterest == "Y") and (float(self.accountBalance) > 0) ):
+            # output += "\nApply Interest?: " + self.applyInterest
+            output += "\nCurrent Month's interest: " + currencySymbol + str(self.calculateInterestAmount())
+        
         output += "\nAccount Created On: " + self.creationDate 
         output += "\n"
                 
@@ -297,9 +349,9 @@ class mortgageAccount(account):
         self.repaymentAccount = repaymentAccount
         
         if (self.mortgageTerm <= 2):
-            self.mortgageInterestRate = 4
-        else:
             self.mortgageInterestRate = 6
+        else:
+            self.mortgageInterestRate = 4
     
     # Function to calculate the mortgage interest amount for the tenure of the mortgage
     def calculateInterestAmount(self):
@@ -342,13 +394,13 @@ class mortgageAccount(account):
     # Function to override the '__str__' function
     def __str__(self):
         output = "\nAccount Id: " + self.accountId
-        output += "\nCustomer Login Id: " + self.customerLoginId
+        # output += "\nCustomer Login Id: " + self.customerLoginId
         output += "\nAccount Type: " + self.accountType.title()
         # output += "\nAccount Balance: " + currencySymbol + str(self.accountBalance)
         output += "\nMortgage Principal: " + currencySymbol + str(self.mortgagePrincipal)
         output += "\nMortgage Term : " + str(self.mortgageTerm) + "years"
         output += "\nMortgage Repayment Account: " + self.repaymentAccount
-        output += "\nMortgage Rate: " + self.mortgageInterestRate
+        output += "\nMortgage Rate: " + self.mortgageInterestRate + "%"
         output += "\nAccount Created On: " + self.creationDate
         
         # output += "\n\nNote: An interest amount of " + currencySymbol + str(self.calculateInterestAmount()) + " will be deducted (when interest is applied to savings accounts) "

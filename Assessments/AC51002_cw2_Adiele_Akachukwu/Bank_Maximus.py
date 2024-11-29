@@ -54,7 +54,7 @@ def storeAccountInfo(accountObject):
         return accountObject
     else:
         # Failure in updating account data on text file
-        print("\n***! Account updated failed")
+        print("\n***! Error: Account updated failed")
         return False
 
 # ---------------------------------------------------------------------------------------------------
@@ -107,7 +107,7 @@ def storeCustomerInfo(customerObject):
         return customerObject
     else:
         # Failure in updating customer data on text file
-        print("\n***! Customer updated failed")
+        print("\n***! Error: Customer updated failed")
         return False
 
 # ---------------------------------------------------------------------------------------------------
@@ -145,7 +145,7 @@ def viewAllAccountsForCustomer(customerObject):
             # Displaying the state of the account
             print(accountObject)
         else:
-            print(f"\n***! Account not found - {accountId}")
+            print(f"\n***! Error: Account not found - {accountId}")
         print("----------------------------------")
             
 # ---------------------------------------------------------------------------------------------------
@@ -156,6 +156,8 @@ def accountMenu(accountId):
     accountObject = getAccountInfo(accountId)   ; # initializing account object for selected account
     
     print("\n\n----------------------------------")
+    print("Account Menu")
+    print("----------------------------------\n")
     
     if (accountObject.accountType != "mortgage account"):
         # Generic account menu
@@ -189,7 +191,7 @@ def accountMenu(accountId):
                     print(f"Your account balance is {currencySymbol}{accountBalance}")
                     print("----------------------------------")
                 else:
-                    print("\n***! Account not found")
+                    print("\n***! Error: Account not found")
                 
                 time.sleep(1)   ; # System pause for 1 second
                 accountMenu(accountId)  ; # Display account menu
@@ -219,7 +221,7 @@ def accountMenu(accountId):
                             print("Invalid amount entered")
                 except IndexError:
                     # Handing possible exceptions
-                    print("\n***! Invalid input")
+                    print("\n***! Error: Invalid input")
                     
                 time.sleep(1)   ; # System pause for 1 second
                 accountMenu(accountId)  ; # Display account menu
@@ -248,7 +250,7 @@ def accountMenu(accountId):
                             print("Invalid amount entered")
                 except IndexError:
                     # Handing possible exceptions
-                    print("\n***! Invalid input")
+                    print("\n***! Error: Invalid input")
                 
                 time.sleep(1)   ; # System pause for 1 second
                 accountMenu(accountId)  ; # Display account menu
@@ -261,7 +263,7 @@ def accountMenu(accountId):
                     print(accountObject)
                     print("----------------------------------")
                 else:
-                    print("\n***! Account not found")
+                    print("\n***! Error: Account not found")
                 
                 time.sleep(1)   ; # System pause for 1 second
                 accountMenu(accountId)  ; # Display account menu
@@ -272,12 +274,12 @@ def accountMenu(accountId):
                 time.sleep(1)   ; # System pause for 1 second
             
             case _:
-                print("\n***! Invalid Input\n")
+                print("\n***! Error: Invalid Input\n")
                 time.sleep(1)   ; # System pause for 1 second
                 accountMenu(accountId)  ; # Display account menu
     except IndexError:
         # Handing possible exceptions
-        print("\n***! Invalid input")
+        print("\n***! Error: Invalid input")
 
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
@@ -354,10 +356,10 @@ def createAccount(customerObject):
                         repaymentAccount = currentAccountsList[int(inputValue) - 1]
                     except IndexError:
                         # Handing possible exceptions
-                        print("\n***! Invalid input")
+                        print("\n***! Error: Invalid input")
                 else:
                     print("\n***! Kindly note, you must have at least one current account with us to proceed.")
-                    print("\n***! Account creation failed")
+                    print("\n***! Error: Account creation failed")
                     time.sleep(1)   ; # System pause for 1 second
                     return False
                 
@@ -374,22 +376,22 @@ def createAccount(customerObject):
 
                 else:
                     print("\n***! Kindly note, you must have at least an existing current account with us to proceed.")
-                    print("\n***! Account creation failed")
+                    print("\n***! Error: Account creation failed")
                     time.sleep(1)   ; # System pause for 1 second
                     return False
                 
             else:
                 print("\n***! Kindly note, you must have at least an existing current account with us to proceed.")
-                print("\n***! Account creation failed")
+                print("\n***! Error: Account creation failed")
                 time.sleep(1)   ; # System pause for 1 second
                 return False
         else:
-            print("\n***! Account creation failed")
+            print("\n***! Error: Account creation failed")
             return False
     
     except IndexError:
         # Handing possible exceptions
-        print("\n***! Invalid input")
+        print("\n***! Error: Invalid input")
     
     
     if (accountStatus == "active"):
@@ -397,7 +399,7 @@ def createAccount(customerObject):
         time.sleep(1)   ; # System pause for 1 second
         return returnVal
     else:
-        print("\n***! Account creation failed")
+        print("\n***! Error: Account creation failed")
         time.sleep(1)   ; # System pause for 1 second
         return False
 
@@ -407,6 +409,8 @@ def createAccount(customerObject):
 # Function to launch the admin menu
 def adminMenu():
     print("\n\n----------------------------------")
+    print("Admin Menu")
+    print("----------------------------------\n")
     print("1 - View Customers")
     print("2 - View Accounts")
     print("# - Return to Home menu \n \n")
@@ -440,12 +444,12 @@ def adminMenu():
                                 print("\n----------------------------------")
                                 print(returnVal)
                             else:
-                                print("\n***! Customer file not found")
+                                print("\n***! Error: Customer file not found")
                     except IndexError:
                         # Handing possible exceptions
-                        print("\n***! Invalid input")
+                        print("\n***! Error: Invalid input")
                 else:
-                    print("\n***! No customer file found")
+                    print("\n***! Error: No customer file found")
 
                 print("\n----------------------------------")
                 time.sleep(1)   ; # System pause for 1 second
@@ -476,12 +480,12 @@ def adminMenu():
                                 print("\n----------------------------------")
                                 print(returnVal)
                             else:
-                                print("\n***! Account not found")
+                                print("\n***! Error: Account not found")
                     except IndexError:
                         # Handing possible exceptions
-                        print("\n***! Invalid input")
+                        print("\n***! Error: Invalid input")
                 else:
-                    print("\n***! No account file found")
+                    print("\n***! Error: No account file found")
 
                 
                 print("\n----------------------------------")
@@ -495,12 +499,12 @@ def adminMenu():
                 homeMenu()  ; # Display home menu
             
             case _:
-                print("\n***! Invalid Input\n")
+                print("\n***! Error: Invalid Input\n")
                 time.sleep(1)   ; # System pause for 1 second
                 adminMenu()  ; # Display admin menu
     except IndexError:
         # Handing possible exceptions
-        print("\n***! Invalid input")
+        print("\n***! Error: Invalid input")
 
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
@@ -521,12 +525,19 @@ def adminLogin():
             if (idInput.lower() == adminName.lower()) and (adminPassword.lower() == passwordInput.lower()):
                 adminMenu()  ; # Display admin menu
             else:
-                print("\n***! Invalid Credentials")
+                print("\n***! Error: Invalid Credentials")
                 time.sleep(1)   ; # System pause for 1 second
                 return False
     except FileNotFoundError:
         # Handing possible exceptions
-        print("\n***! Admin profile not found")
+        print("\n***! Error: Admin profile not setup")
+        print("Kindly try again\n")
+        
+        # Redundancy to setup admin profile
+        with open( baseDirectory +"admin.txt", "w", encoding="UTF-8" ) as openedFile:
+            openedFile.write("admin,admin123")  ; # Write to update on the file
+        
+        time.sleep(1)   ; # System pause for 1 second    
         return False
 
 # ---------------------------------------------------------------------------------------------------
@@ -582,9 +593,9 @@ def customerMenu(customerFile):
                             returnVal = accountMenu(loggedInCustomer.customerAccountsList[int(inputValue) - 1])
                     except IndexError:
                         # Handing possible exceptions
-                        print("\n***! Invalid input")
+                        print("\n***! Error: Invalid input")
                 else:
-                    print("\n***! No account file found")
+                    print("\n***! Error: No account file found")
                 
                 time.sleep(1)   ; # System pause for 1 second
                 customerMenu(customerFile)  ; # Display customer menu
@@ -617,7 +628,7 @@ def customerMenu(customerFile):
                     viewAllAccountsForCustomer(loggedInCustomer)
                 else:
                     # Error when customer has no account to view
-                    print("\n***! No account file found")
+                    print("\n***! Error: No account file found")
                 
                 time.sleep(1)   ; # System pause for 1 second
                 customerMenu(customerFile)  ; # Display customer menu
@@ -629,12 +640,12 @@ def customerMenu(customerFile):
                 homeMenu()
             
             case _:
-                print("\n***! Invalid Input\n")
+                print("\n***! Error: Invalid Input\n")
                 time.sleep(1)   ; # System pause for 1 second
                 customerMenu(customerFile)  ; # Display customer menu
     except IndexError:
         # Handing possible exceptions
-        print("\n***! Invalid input")
+        print("\n***! Error: Invalid input")
 
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
@@ -657,11 +668,11 @@ def customerLogin():
             if (customerPassword == passwordInput):
                 customerMenu(fileContent)  ; # Display customer menu
             else:
-                print("\n***! Invalid password")
+                print("\n***! Error: Invalid password")
                 return False
     except FileNotFoundError:
         # Handing possible exceptions
-        print("\n***! Customer not found")
+        print("\n***! Error: Customer not found")
         return False
 
 # ---------------------------------------------------------------------------------------------------
@@ -669,6 +680,10 @@ def customerLogin():
 
 # Function to register a new customer
 def registerCustomer():
+    print("\n\n----------------------------------")
+    print("Customer Registration")
+    print("----------------------------------\n")
+    
     print("\n----------------------------------")
     print("\nTo register as a new customer, follow the below prompts and provide accurate details: ")
     print("Note: All information are mandatory, hence all input are required \n")
@@ -683,7 +698,7 @@ def registerCustomer():
     
     # Check if login id provided already exists
     if (returnVal != False):
-        print("\n***! This id already exists")
+        print("\n***! Error: This id already exists")
     else:
         firstName = input("\nEnter first name: ")
         lastName = input("\nEnter last name: ")
@@ -691,17 +706,17 @@ def registerCustomer():
         dobDay = int(input("\nEnter Date of Birth - Day: "))
         # Check for valid day input
         if ( (dobDay < 1) or (dobDay > 31) ):
-            print("\n***! Invalid day inputted")
+            print("\n***! Error: Invalid day inputted")
         else:
             dobMonth = int(input("\nEnter Date of Birth - Month: "))
             # Check for valid month input
             if ( (dobMonth < 1) or (dobMonth > 12) ):
-                print("\n***! Invalid Month inputted")
+                print("\n***! Error: Invalid Month inputted")
             else:
                 dobYear = int(input("\nEnter Date of Birth - Day: "))
                 # Check for valid year input
                 if ( (len(str(dobYear)) < 0) or (len(str(dobYear)) > 4) or (dobYear > todayYear) ):
-                    print("\n***! Invalid year inputted")
+                    print("\n***! Error: Invalid year inputted")
                 else:
                     dateOfBirth = str(dobDay) +'/'+ str(dobMonth) +'/'+ str(dobYear)
                     
@@ -709,7 +724,7 @@ def registerCustomer():
                     email = input("\nEnter email: ")
                     # Check for valid mail input
                     if (email.count('@') != 1):
-                        print("\n***! Invalid email inputted")
+                        print("\n***! Error: Invalid email inputted")
                     else:
                         occupation = input("\nEnter occupation: ")
                         creationDate = str(todayDay) +'/'+ str(todayMonth) +'/'+ str(todayYear) ; # Formating the date
@@ -721,8 +736,8 @@ def registerCustomer():
                             loggedInCustomer.generateCustomerId(customersDirectory)
                             registrationStatus = loggedInCustomer.status
                         else:
-                            print("\nEmpty information provided among inputs")
-                            print("\n***! Customer creation failed")
+                            print("\n***! Empty information provided among inputs")
+                            print("\n***! Error: Customer creation failed")
                 
     if (registrationStatus == "Created"):
         fileName = customersDirectory  + loggedInCustomer.customerLoginId +".txt"  ; # File name for customer file
@@ -734,13 +749,12 @@ def registerCustomer():
         try:
             with open( fileName, "w", encoding="UTF-8" ) as openedFile:
                 openedFile.write(fileContent)  ; # Write to update on the file
-                print("\nCustomer registered successfully")
-                print("Proceed to login")
+                print("\nCustomer registered successfully\n")
         except FileNotFoundError:
             # Handing possible exceptions
-            print("\n***! Customer creation failed")
+            print("\n***! Error: Customer creation failed")
     else:
-        print("\n***! Customer creation failed")
+        print("\n***! Error: Customer creation failed")
     time.sleep(1)   ; # System pause for 1 second
 
 # ---------------------------------------------------------------------------------------------------
@@ -748,8 +762,9 @@ def registerCustomer():
 
 # Function to launch the home menu 
 def homeMenu():
-    print("\n----------------------------------")
-    print("\nWelcome to 'Bank Maximus' \n")
+    print("\n\n----------------------------------")
+    print("Welcome to 'Bank Maximus'")
+    print("----------------------------------\n")
     print("1 - Login as existing customer")
     print("2 - Register as a new customer")
     print("3 - Switch to Admin Menu")
@@ -779,16 +794,16 @@ def homeMenu():
                 print("\n----------------------------------")
                 print("\n***! Exiting !***\n")
                 print("----------------------------------\n")
-                time.sleep(3)   ; # System pause for 3 seconds
+                time.sleep(2)   ; # System pause for 2 seconds
                 sys.exit()  ; # Exit program
             
             case _:
-                print("\n***! Invalid Input\n")
+                print("\n***! Error: Invalid Input\n")
                 time.sleep(1)   ; # System pause for 1 second
                 homeMenu() ; # Display home menu
     except IndexError:
         # Handing possible exceptions
-        print("\n***! Invalid input")
+        print("\n***! Error: Invalid input")
 
 # ---------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------
