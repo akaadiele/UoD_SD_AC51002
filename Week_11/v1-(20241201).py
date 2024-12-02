@@ -1,6 +1,6 @@
 import os, time
-# import numpy as np
-# import matplotlib.pyplot as plt
+import numpy as np
+import matplotlib.pyplot as plt
 
 baseDirectory = os.path.dirname(os.path.abspath(__file__)) + "/"
 elfPasswords = "input.txt"
@@ -43,21 +43,20 @@ try:
 
         print("\nAnalysis of the Elves passwords: ")
         print("____________________________________________________")
-        print("__Word-length___:___Count___")
+        print("__Word-length___:___Count___:___Status__")
         for key in passwordLogKeys:
             if key < minimumPasswordLength:
-                # Invalid password - less than minimum length
                 invalidPasswordCount += int(passwordLog[key])
+                status = "Invalid"
             else:
                 if ( checkForNumber(passwordLog[key]) == False ):
-                    # Invalid password - does not contain at least a number
                     invalidPasswordCount += int(passwordLog[key])
+                    status = "Invalid"
                 else:
-                    # Valid password - meets minimum length and contains at least a number
                     validPasswordCount += int(passwordLog[key])
-                    
+                    status = "Valid"
 
-            print(f"> {key}-letters     -     {passwordLog[key]}")
+            print(f"> {key}-letters     -     {passwordLog[key]}    -    {status}")
 
         print("____________________________________________________\n")
         print(f"Total invalid passwords : {invalidPasswordCount}")
@@ -65,16 +64,16 @@ try:
 
     # ____________________________________________________
     # Plotting The Graph
-    # if (passwordLogKeys != "") and (passwordLogVals != ""):
-    #     plt.xlabel("Word Length")
-    #     plt.ylabel("Count")
+    if (passwordLogKeys != "") and (passwordLogVals != ""):
+        plt.xlabel("Word Length")
+        plt.ylabel("Count")
 
-    #     xAxisValues = list(passwordLogKeys)
-    #     yAxisValues = list(passwordLogVals)
-    #     plt.plot(xAxisValues, yAxisValues)
-    #     plt.title("Elves' Passwords Word Lengths\n(Prepared for Santa)")
+        xAxisValues = list(passwordLogKeys)
+        yAxisValues = list(passwordLogVals)
+        plt.plot(xAxisValues, yAxisValues)
+        plt.title("Elves' Passwords Word Lengths\n(Prepared for Santa)")
 
-    #     plt.show()
+        plt.show()
 
 except FileNotFoundError:
     print("File for elves passwords not found")

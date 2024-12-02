@@ -1,6 +1,4 @@
 import os, time
-import numpy as np
-import matplotlib.pyplot as plt
 
 baseDirectory = os.path.dirname(os.path.abspath(__file__)) + "/"
 elfPasswords = "input.txt"
@@ -8,6 +6,10 @@ passwordWordLog = { }; passwordCountLog = {} ; passwordsPerWordLength = {}
 minimumPasswordLength = 8
 validPasswordCount = invalidPasswordCount = 0
 
+
+def checkForNumber(passwordToCheck):
+    hasNumber = any(char.isdigit() for char in passwordToCheck)
+    return hasNumber
 
 
 try:
@@ -32,71 +34,86 @@ try:
                 passwordWordLog[passwordLen] = password.split()     ; # Keep track of all words for each word length
                 passwordCountLog[passwordLen] = 1       ; # Keep track of the number of words for each word length
 
+        # dict(sorted(passwordWordLog.items()))
+        # sorted(passwordWordLog.items())
         
-        # Sorting the dictionary by keys
         passwordWordLogSorted = {}
         for countKey in sorted(passwordWordLog.keys()):
             passwordWordLogSorted[countKey] = sorted(passwordWordLog[countKey])
-        
         passwordWordLog = passwordWordLogSorted
+        
         passwordWordLogKeys = passwordWordLog.keys()        ; # Used in password analysis
         passwordWordLogVals = passwordWordLog.values()        ; # Used in password analysis
+        print(passwordWordLogKeys)
+        print(passwordWordLogVals)
         
         
-        # Sorting the dictionary by keys
+        # dict(sorted(passwordCountLog.items()))
+        # sorted(passwordCountLog.items())
+        print()
+        passwordCountLogKeys = passwordCountLog.keys()      ; # used in plotting graph (x axis)
+        passwordCountLogVals = passwordCountLog.values()      ; # used in plotting graph (y axis)
+        # print(passwordCountLogKeys)
+        # print(passwordCountLogVals)
+    
         passwordCountLogSorted = {}
         for countKey in sorted(passwordCountLog.keys()):
             passwordCountLogSorted[countKey] = passwordCountLog[countKey]
-        
         passwordCountLog = passwordCountLogSorted
+        # print(passwordCountLog)
+        # print(passwordCountLogSorted)
         passwordCountLogKeys = passwordCountLog.keys()      ; # used in plotting graph (x axis)
         passwordCountLogVals = passwordCountLog.values()      ; # used in plotting graph (y axis)
-        
+        print(passwordCountLogKeys)
+        print(passwordCountLogVals)
+    
     # ____________________________________________________
     # Checking for valid passwords
-        print("\n____________________________________________________")
-        print("***Santa's new rules for valid passwords:")
-        print(f"   > Each password must be at least {minimumPasswordLength} characters long")
+        print("\n***Santa's new rules for valid passwords:")
+        print(f"   > Each password must be at least '{minimumPasswordLength}' characters long")
         print(f"   > And contain at least one number")
         time.sleep(1)
         
-        
-        print("\n____________________________________________________")
-        print("Analysis of the Elves passwords: \n")
-        
-        # For each word length, loop through each set of words and check against santa's rules
+        # passwordWordLogKeys
+        # passwordWordLogVals
+
+        print("\nAnalysis of the Elves passwords: ")
+        print("____________________________________________________")
+        print("__Word length___:___Count___:___With Number___")
         for key in passwordWordLogKeys:
             if key < minimumPasswordLength:
                 # Invalid password - less than minimum length 
                 # For all words in that word length
                 invalidPasswordCount += int( len(passwordWordLog[key]) )
             else:
-                for passwordWord in passwordWordLog[key]:
-                    hasNumber = any(char.isdigit() for char in passwordWord)
-                    if ( hasNumber == False ):
+                for password in passwordWordLog[key]:
+                    if ( checkForNumber(password) == False ):
                         # Invalid password - does not contain at least a number
                         invalidPasswordCount += 1
                     else:
                         # Valid password - meets minimum length and contains at least a number
                         validPasswordCount += 1
+                    
 
-        print(f"Total valid passwords : {validPasswordCount}")
-        print(f"Total invalid passwords : {invalidPasswordCount}")
         print("____________________________________________________\n")
+        print(f"Total invalid passwords : {invalidPasswordCount}")
+        print(f"Total valid passwords : {validPasswordCount}")
 
     # ____________________________________________________
     # # Plotting The Graph
+    # import numpy as np
+    # import matplotlib.pyplot as plt
 
-    if (passwordCountLogKeys != "") and (passwordCountLogVals != ""):
-        plt.xlabel("Word Length")
-        plt.ylabel("Count")
+    # if (passwordCountLogKeys != "") and (passwordCountLogVals != ""):
+    #     plt.xlabel("Word Length")
+    #     plt.ylabel("Count")
 
-        xAxisValues = list(passwordCountLogKeys)
-        yAxisValues = list(passwordCountLogVals)
-        plt.plot(xAxisValues, yAxisValues)
-        plt.title("Elves' Passwords Word Lengths\n(Prepared for Santa)")
-        
-        plt.show()
+    #     xAxisValues = list(passwordCountLogKeys)
+    #     yAxisValues = list(passwordCountLogVals)
+    #     plt.plot(xAxisValues, yAxisValues)
+    #     plt.title("Elves' Passwords Word Lengths\n(Prepared for Santa)")
+
+    #     plt.show()
 
 except FileNotFoundError:
     print("File for elves passwords not found")

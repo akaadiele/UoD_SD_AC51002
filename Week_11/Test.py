@@ -57,4 +57,8 @@ x = list(passwordLogKeys)
 y = list(passwordLogVals)
 plt.plot(x,y)
 
+
+print(x)
+print(y)
+
 plt.show()
