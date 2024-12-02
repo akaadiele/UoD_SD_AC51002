@@ -1,5 +1,4 @@
 import os, time
-import numpy as np
 import matplotlib.pyplot as plt
 
 elfPasswordsFileName = "input.txt"
@@ -77,7 +76,7 @@ try:
         
         
         print("____________________________________________________\n")
-        print("Analysis of the Elves passwords: \n")
+        print("***Analysis of the Elves passwords:")
         
         # For each word length, loop through each set of words and check against santa's rules
         for key in passwordWordLogKeys:
@@ -95,9 +94,9 @@ try:
                         # Valid password - meets minimum length and contains at least a number
                         validPasswordCount += 1
 
-        print(f"Total elves passwords checked : {fileContentCount}")
-        print(f"Total valid passwords : {validPasswordCount}")
-        print(f"Total invalid passwords : {invalidPasswordCount}")
+        print(f"   > Total elves passwords checked : {fileContentCount}")
+        print(f"   > Total valid passwords : {validPasswordCount}")
+        print(f"   > Total invalid passwords : {invalidPasswordCount}")
         print("____________________________________________________\n")
 
     # ____________________________________________________
@@ -110,9 +109,10 @@ try:
         
         plt.xlabel("Password Word-Lengths")
         plt.ylabel("Count of Passwords")
-        plt.title("Elves' Passwords Word Lengths\n(Prepared for Santa)")
+        plt.title("Elves' Passwords Word Lengths\n(prepared for Santa)")
         
         plt.show()
 
 except FileNotFoundError:
     print("File for elves passwords not found")
+
