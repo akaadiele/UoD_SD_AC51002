@@ -25,8 +25,9 @@ def checkForNumber(passwordToCheck):
     return hasNumber
 
 try:
-    # Reading file
     with open(baseDirectory + elfPasswordsFileName, "r", encoding="UTF-8") as openedFile:
+    # ____________________________________________________
+    # Reading file
         fileContent = openedFile.read()
         fileContent = fileContent.strip().split()
         fileContentCount = len(fileContent)
@@ -103,12 +104,12 @@ try:
     # # Plotting The Graph
 
     if (passwordCountLogKeys != "") and (passwordCountLogVals != ""):
-        plt.xlabel("Word Length")
-        plt.ylabel("Count")
-
         xAxisValues = list(passwordCountLogKeys)
         yAxisValues = list(passwordCountLogVals)
         plt.plot(xAxisValues, yAxisValues)
+        
+        plt.xlabel("Password Word-Lengths")
+        plt.ylabel("Count of Passwords")
         plt.title("Elves' Passwords Word Lengths\n(Prepared for Santa)")
         
         plt.show()
