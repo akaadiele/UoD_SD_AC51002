@@ -2,20 +2,34 @@ import os, time
 import numpy as np
 import matplotlib.pyplot as plt
 
+elfPasswordsFileName = "input.txt"
 baseDirectory = os.path.dirname(os.path.abspath(__file__)) + "/"
-elfPasswords = "input.txt"
 passwordWordLog = { }; passwordCountLog = {} ; passwordsPerWordLength = {}
-minimumPasswordLength = 8
-validPasswordCount = invalidPasswordCount = 0
+minimumPasswordLength = 8 ; validPasswordCount = 0 ; invalidPasswordCount = 0
 
 
+def checkForNumber(passwordToCheck):
+    hasNumber = False
+    # hasNumber = any(char.isdigit() for char in passwordToCheck)
+    
+    for char in passwordToCheck:
+    # Loop through each charater checking if it is a digit
+        if ( char.isdigit() ):
+            # A digit has been found
+            hasNumber = True
+            break
+        else:
+            # Character is not a digit
+            pass
+
+    return hasNumber
 
 try:
-    # ____________________________________________________
     # Reading file
-    with open(baseDirectory + elfPasswords, "r", encoding="UTF-8") as openedFile:
+    with open(baseDirectory + elfPasswordsFileName, "r", encoding="UTF-8") as openedFile:
         fileContent = openedFile.read()
         fileContent = fileContent.strip().split()
+        fileContentCount = len(fileContent)
 
         for password in fileContent:
             passwordLen = len(password)
@@ -53,15 +67,15 @@ try:
         passwordCountLogVals = passwordCountLog.values()      ; # used in plotting graph (y axis)
         
     # ____________________________________________________
-    # Checking for valid passwords
-        print("\n____________________________________________________")
+    # Checking for valid passwords based on Santa's new rules
+        print("____________________________________________________\n")
         print("***Santa's new rules for valid passwords:")
         print(f"   > Each password must be at least {minimumPasswordLength} characters long")
         print(f"   > And contain at least one number")
         time.sleep(1)
         
         
-        print("\n____________________________________________________")
+        print("____________________________________________________\n")
         print("Analysis of the Elves passwords: \n")
         
         # For each word length, loop through each set of words and check against santa's rules
@@ -72,7 +86,7 @@ try:
                 invalidPasswordCount += int( len(passwordWordLog[key]) )
             else:
                 for passwordWord in passwordWordLog[key]:
-                    hasNumber = any(char.isdigit() for char in passwordWord)
+                    hasNumber = checkForNumber(passwordWord)
                     if ( hasNumber == False ):
                         # Invalid password - does not contain at least a number
                         invalidPasswordCount += 1
@@ -80,6 +94,7 @@ try:
                         # Valid password - meets minimum length and contains at least a number
                         validPasswordCount += 1
 
+        print(f"Total elves passwords checked : {fileContentCount}")
         print(f"Total valid passwords : {validPasswordCount}")
         print(f"Total invalid passwords : {invalidPasswordCount}")
         print("____________________________________________________\n")
